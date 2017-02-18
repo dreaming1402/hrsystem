@@ -1,0 +1,74 @@
+* { margin: 0px; padding: 0px; box-sizing: border-box; }
+.viewer {}
+.viewer .hint {
+    text-align: center;
+    margin: 100px auto;
+    color: #8a8a8a;
+    width: 100%;
+}
+
+/* My card */
+.mycard {
+	/* CR-80: 53.98 x 85.6mm */
+	width: 204.018897638px;
+	height: 323.527559055px;
+	display: block;
+	overflow: hidden;
+	background-color: #fff;
+	position: relative;
+	background-size: 100% auto;
+    box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.7);
+}
+@media print {
+	.mycard { width: 100% !important; height: 100% !important; box-shadow: none !important; }
+}
+.mycard .layer {
+	position: absolute;
+	top: 0px; right: 0px; bottom: 0px; left: 0px;
+	padding: 0px;
+	margin: 0px;
+	overflow: hidden;
+
+	color: #000;	
+	font-family: 'Roboto', 'robotoregular';
+	line-height: 1.2;
+	font-size: 9px;
+	text-align: center;
+	text-transform: uppercase;
+}
+.mycard .layer img {
+	width: 100%;
+	height: auto;
+	margin: 0px;
+	padding: 0px;
+}
+.mycard .layer p {
+	margin: 7px;
+	padding: 0px;
+
+	color: inherit;	
+	font-family: inherit;
+	font-size: inherit;
+	line-height: inherit;
+	text-align: inherit;
+	text-transform: inherit;
+}
+
+.mycard .layer.background {	top: auto; line-height: 0; }
+.mycard .layer.company-logo { width: 106px; top: 16px; bottom: auto; margin: 0px auto; }
+.mycard .layer.company-slogan {
+	top: auto;
+	color: #fff;
+    text-transform: capitalize;
+    font-size: 9px;
+}
+.mycard .layer.company-brand {
+    /* display: block;
+    height: 350px;
+    background-size: 100% auto;
+    background-repeat: no-repeat;
+    background-position: center;
+    
+    position: absolute;
+    top: 100px; right: 40px; left: 40px; */
+}

@@ -1,0 +1,15 @@
+/* Visitor */
+.mycard.visitor { background-image: url('asset/bg-limit.png') !important; }
+.mycard.visitor .brand { background-image: url('asset/vipbrand.png'); }
+.mycard.visitor .name {	
+	font-family: 'Roboto Black';
+	margin-left: 50px;
+	margin-right: 50px;
+	font-size: 50px;
+	margin-top: 480px;
+}
+.mycard.visitor .id {
+	margin-bottom: 6px;
+	font-size: 30px;
+	font-family: 'Roboto Condensed';
+}

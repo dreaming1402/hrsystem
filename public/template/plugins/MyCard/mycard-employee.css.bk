@@ -1,0 +1,163 @@
+/* Employee card */
+.mycard.employee .employee-detail { top: 370px; }
+.mycard.employee .employee-department {
+	font-family: 'Roboto Black', 'robotoblack';
+	font-size: 24px;
+}
+.mycard.employee .employee-id {
+	margin: 6px 30px;
+	font-family: 'Roboto', 'robotoregular';
+	font-size: 22px;
+}
+.mycard.employee .employee-name {
+	margin: 10px 30px;
+	font-family: 'Roboto Black', 'robotoblack';
+	font-size: 32px;
+}
+.mycard.employee .employee-position {
+	margin-bottom: 6px;
+	font-family: 'Roboto Condensed', 'roboto_condensedregular';
+	font-size: 22px;
+}
+.mycard.employee .employee-image {
+	width: 202px;
+    height: 276px;
+    top: 90px;
+    margin: 0px auto 5px auto;
+
+    border-radius: 20px;
+	border: 1px solid #7f7f7f;
+}
+.mycard.employee .employee-image img { width: 100%; height: 100%; }
+.mycard.employee .unlimit {
+	top: 310px;
+    width: 140px;
+    left: 190px;
+    bottom: auto;
+}
+.mycard.employee .datelimit {
+	font-size: 22px;
+	font-family: 'Roboto Black', 'robotoblack';
+	color: #ff0000;
+	text-transform: none;
+	text-align: left;
+}
+.mycard.employee .datelimit p {
+    padding: 10px;
+    background-color: rgba(255,255,255,0.6);
+    border-radius: 10px;
+}
+.mycard.employee .datelimit p span {
+	width: 105px;
+	display: inline-block;
+}
+
+/* Employee staff */
+.mycard.employee.staff {
+	width: 6.76in; /* 3.38in; */
+	height: 4.28in; /* 2.14in; */
+}
+.mycard.employee.staff .company-logo {
+	top: auto; left: 340px; bottom: 55px; right: auto;
+    margin: 0px;
+}
+.mycard.employee.staff .company-slogan {
+	top: 40px; right: auto; bottom: auto; left: 320px;
+	color: #fff;
+}
+.mycard.employee.staff .employee-image {
+	top: 70px; right: auto; bottom: auto; left: 56px;
+	margin: 0px;
+}
+.mycard.employee.staff .employee-detail { top: 95px; right: 0px; bottom: auto; left: 248px; }
+.mycard.employee.staff .employee-detail p { color: #fff; }
+.mycard.employee.staff .unlimit {
+	top: 294px; right: auto; bottom: auto; left: 140px;
+    width: 140px;
+}
+
+/* Employee pregnant */
+.mycard.employee.pregnant {
+	width: 6.76in; /* 3.38in; */
+	height: 4.28in; /* 2.14in; */
+}
+.mycard.employee.pregnant .company-logo {
+	top: 30px; right: auto; bottom: auto; left: 52px;
+	margin: 0px;
+}
+.mycard.employee.pregnant .company-slogan {
+	top: auto; right: auto; bottom: 4px; left: 28px;
+	color: #146eb4;
+}
+.mycard.employee.pregnant .employee-image {
+	top: 80px; right: auto; bottom: auto; left: 56px;
+	margin: 0px;
+}
+.mycard.employee.pregnant .employee-detail { top: 115px; right: 0px; bottom: auto; left: 248px; }
+.mycard.employee.pregnant .employee-detail p { color: #000; }
+.mycard.employee.pregnant .unlimit {
+	top: 294px; right: auto; bottom: auto; left: 140px;
+    width: 140px;
+}
+.mycard.employee.pregnant .datelimit {
+	top: auto; right: 0px; bottom: auto; left: auto;
+}
+
+/* Employee hasbaby */
+.mycard.employee.hasbaby {
+	width: 6.76in; /* 3.38in; */
+	height: 4.28in; /* 2.14in; */
+}
+.mycard.employee.hasbaby .company-logo {
+	top: 30px; right: auto; bottom: auto; left: 52px;
+	margin: 0px;
+}
+.mycard.employee.hasbaby .company-slogan {
+	top: auto; right: auto; bottom: 4px; left: 28px;
+	color: #146eb4;
+}
+.mycard.employee.hasbaby .employee-image {
+	top: 80px; right: auto; bottom: auto; left: 56px;
+	margin: 0px;
+}
+.mycard.employee.hasbaby .employee-detail { top: 115px; right: 0px; bottom: auto; left: 248px; }
+.mycard.employee.hasbaby .employee-detail p { color: #000; }
+.mycard.employee.hasbaby .unlimit {
+	top: 294px; right: auto; bottom: auto; left: 140px;
+    width: 140px;
+}
+.mycard.employee.hasbaby .datelimit {
+	top: auto; right: 0px; bottom: auto; left: auto;
+}
+
+.mycard.back {}
+.mycard.back .background { width: 240px; top: 0px; right: auto; bottom: auto; left: 0px; }
+.mycard.back .company-logo { position: relative; top: 0px; right: 0px; bottom: 0px left: 0px; margin: 15px 15px 0px 30px; }
+.mycard.back .context { position: relative; margin-top: 10px; }
+.mycard.back .company-contact { position: relative; margin-top: 5px; }
+.mycard.back .text { display: block; text-transform: none; text-align: left; margin: 15px 30px; font-family: 'Roboto Light', 'robotolight'; }
+.mycard.back .text small { display: block; }
+
+.mycard.back.employee.staff, {
+	width: 6.76in; /* 3.38in; */
+	height: 4.28in; /* 2.14in; */
+}
+.mycard.back.employee.staff .background { width: auto; top: auto; right: 0px; bottom: 0px; left: 0px; }
+.mycard.back.employee.staff .company-logo { position: absolute; top: auto; right: 80px; bottom: 85px; left: auto; }
+.mycard.back.employee.staff .text { color: #fff; margin: 5px 20px; }
+
+.mycard.back.employee.pregnant {
+	width: 6.76in; /* 3.38in; */
+	height: 4.28in; /* 2.14in; */
+}
+.mycard.back.employee.pregnant .background { width: 100%; top: auto; right: 0px; bottom: 0px; left: 0px; }
+.mycard.back.employee.pregnant .company-logo { position: absolute; top: auto; right: 80px; bottom: 85px; left: auto; }
+.mycard.back.employee.pregnant .text { color: #000; margin: 5px 20px; }
+
+.mycard.back.employee.hasbaby {
+	width: 6.76in; /* 3.38in; */
+	height: 4.28in; /* 2.14in; */
+}
+.mycard.back.employee.hasbaby .background { width: 100%; top: auto; right: 0px; bottom: 0px; left: 0px; }
+.mycard.back.employee.hasbaby .company-logo { position: absolute; top: auto; right: 80px; bottom: 85px; left: auto; }
+.mycard.back.employee.hasbaby .text { color: #000; margin: 5px 20px; }
