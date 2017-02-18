@@ -1,4 +1,4 @@
-<?php if ( ! defined('PATH_SYSTEM')) die ('Bad requested!');
+<?php if (!defined('PATH_SYSTEM')) die ('Bad requested!');
 
 return array(
     'default_controller'    => 'index', // controller mặc định
