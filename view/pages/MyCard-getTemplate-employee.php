@@ -16,7 +16,7 @@ $back_background_src = 'src="'.$plugin_dir.'/img/bg-back.png"';
 
 if (isset($_GET['pregnant'])) {
 	$mycard_class .= ' pregnant';
-	$datelimit = '<div class="layer datelimit"><p>Từ ngày: {start-date}</p></div>';
+	$datelimit = '<div class="layer datelimit"><p>Từ ngày: {maternity_begin}</p></div>';
 
 	$logo_src = 'src="'.$plugin_dir.'/img/logo.png"';
 	$background_src = 'src="'.$plugin_dir.'/img/bg-pregnant.png"';
@@ -26,7 +26,7 @@ if (isset($_GET['pregnant'])) {
 
 } else if (isset($_GET['hasbaby'])) {
 	$mycard_class .= ' hasbaby';
-	$datelimit = '<div class="layer datelimit"><p><span>Từ ngày:</span>{start-date}<br><span>Đến ngày:</span>{end-date}</p></div>';
+	$datelimit = '<div class="layer datelimit"><p><span>Từ ngày:</span> {maternity_begin}<br><span>Đến ngày:</span> {maternity_end}</p></div>';
 
 	$logo_src = 'src="'.$plugin_dir.'/img/logo.png"';
 	$background_src = 'src="'.$plugin_dir.'/img/bg-hasbaby.png"';
