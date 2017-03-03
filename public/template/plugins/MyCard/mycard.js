@@ -88,10 +88,10 @@ function MyCard(option) {
 
         canvas.id = item.attr('id');
         canvas.setAttribute('class', 'render');
-        canvas.width = item.width();
-        canvas.height = item.height();
+        canvas.width = item.width()*2;
+        canvas.height = item.height()*2;
 
-        rasterizeHTML.drawHTML(item.html(), canvas)
+        rasterizeHTML.drawHTML(item.html(), canvas, {zoom:2})
         .then(function success(renderResult) {
             //context.drawImage(renderResult.image, 0, 0);
             item.append(canvas);
@@ -123,10 +123,10 @@ function MyCard(option) {
 
             canvas.id = item.attr('id');
             canvas.setAttribute('class', 'render');
-            canvas.width = item.width();
-            canvas.height = item.height();
+            canvas.width = item.width()*2;
+            canvas.height = item.height()*2;
 
-            rasterizeHTML.drawHTML(item.html(), canvas)
+            rasterizeHTML.drawHTML(item.html(), canvas, {zoom:2})
             .then(function success(renderResult) {
                 //context.drawImage(renderResult.image, 0, 0);
                 item.append(canvas);

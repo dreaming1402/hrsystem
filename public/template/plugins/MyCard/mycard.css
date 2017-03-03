@@ -22,6 +22,15 @@
 @media print {
 	.mycard { width: 100% !important; height: 100% !important; box-shadow: none !important; }
 }
+.mycard canvas.render { 
+	margin: 0px;
+    padding: 0px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 1;
+    zoom: inherit;
+}
 .mycard .layer {
 	position: absolute;
 	top: 0px; right: 0px; bottom: 0px; left: 0px;
