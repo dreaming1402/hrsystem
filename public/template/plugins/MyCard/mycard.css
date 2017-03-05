@@ -29,7 +29,8 @@
     top: 0px;
     left: 0px;
     z-index: 1;
-    zoom: inherit !important;
+    width: 100% !important;
+    height: auto !important;
 }
 .mycard .layer {
 	position: absolute;
