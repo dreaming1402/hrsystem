@@ -68,7 +68,7 @@
 .mycard .layer.company-logo { width: 106px; top: 16px; bottom: auto; margin: 0px auto; }
 .mycard .layer.company-slogan {
 	top: auto;
-	color: #fff;
+	color: #fff !important;
     text-transform: capitalize;
     font-size: 9px;
 }

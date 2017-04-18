@@ -1,6 +1,6 @@
 <?php
-include_once '/inc/lang.php';
-include_once '/inc/helper.php';
+include_once 'inc/lang.php';
+include_once 'inc/helper.php';
 
 if (!function_exists('setup_site')) {
 	$GLOBALS['template'] = [
