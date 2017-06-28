@@ -37,6 +37,7 @@ function Upload(option) {
 
 // setup
 	var dropzone = $(option.renderTo).find('.drop-zone'),
+		item_count = $(option.renderTo).find('.item-count'),
 		file_handler = dropzone.find('input:file.file-handler');
 		hint = dropzone.find('.hint'),
 		item_demo = dropzone.find('.item.demo'),
@@ -51,11 +52,16 @@ function Upload(option) {
                     	+'<span action="'+option.namespace+'.sendFile" role="trying" class="control-action text-orange"><i class="fa fa-refresh"></i></span>'
                     	+'<span action="'+option.namespace+'.removeItem" role="remove" class="control-action text-red"><i class="fa fa-times"></i></span>'
                     	+'<span action="'+option.namespace+'.deleteFile" role="delete" class="control-action bg-red"><i class="fa fa-trash"></i></span>'
-                	+'</div><!--control--></div><!--centered--></div><!--overlay--></div><!--item--></div><!--drop-zone-->');
+                	+'</div><!--control--></div><!--centered--></div><!--overlay--></div><!--item--></div><!--drop-zone--><p class="item-count"></p>');
 
 	if (!dropzone.length) {
 		$(option.renderTo).prepend(template);
 		dropzone = $(option.renderTo).find('.drop-zone');
+	};
+
+	if (!item_count.length) {
+		$(option.renderTo).prepend(template.find('.item-count'));
+		item_count = $(option.renderTo).find('.item-count');
 	};
 
 	if (!file_handler.length) {
@@ -143,6 +149,8 @@ function Upload(option) {
 		else
 			hint.removeClass('hidden');
 
+		item_count.html("Total: " + item_lists.length);
+
 		if (option.callback && option.callback.onChange)
 			window[option.callback.onChange]('changed');
 	}
@@ -215,6 +223,10 @@ function Upload(option) {
 
 	function remove_item(item_id) {
 		dropzone.find('.item#'+item_id).remove();
+
+		var pos = item_lists.indexOf(item_lists[item_id]);
+		if (pos > -1)
+			item_lists.splice(pos, 1);
 
     	show_hint();
 
@@ -309,7 +321,7 @@ function Upload(option) {
 					item.attr('class', 'item failed');
 				}
 
-				show_hint();
+				remove_item(item_id);
 
 				if (option.callback && option.callback.onDeleteFileSuccess)
 					window[option.callback.onDeleteFileSuccess]({data: data, textStatus: textStatus, jqXHR: jqXHR});
