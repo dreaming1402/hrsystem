@@ -1,5 +1,5 @@
 * { margin: 0px; padding: 0px; box-sizing: border-box; }
-.item {
+/* .item {
     width: auto;
     height: auto;
     display: inline-block;
@@ -38,7 +38,7 @@
     right: 0px;
     top: 50%;
 }
-
+ */
 .qq-alert-dialog-selector { margin: auto; }
 
 /* Loading kit */
@@ -106,6 +106,24 @@ a[href*='fancygrid.com'] {display: none !important;}
 
 .fancy.fancy-form {
 	padding-bottom: 20px;
+}
+.fancy.fancy-panel {
+	/* -webkit-box-shadow: 0 0 3px rgba(0,0,0,.15);
+	    -moz-box-shadow: 0 0 3px rgba(0,0,0,.15);
+	    box-shadow: 0 0 3px rgba(0,0,0,.15); */
+}
+.action-print_card {
+  cursor: pointer;
+  padding: 5px !important;
+  position: relative;
+  top: -5px;
+  border-radius: 2px;
+  background-color: #E4827D;
+  color: #FFF;
+}
+
+.action-print_card:hover {
+  background-color: #F9DDE0;
 }
 
 #upload-employeeImage {

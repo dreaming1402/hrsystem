@@ -1,0 +1,39 @@
+{
+	"success": true,
+	"data": [
+		{    
+			"id":             "0",
+			"department":     "Accounting",
+			"employee_id":    "15090082",
+			"employee_old_id":"2200",  
+			"full_name":      "TRẦN THỊ LIÊN",
+			"birth_date":     "10/08/1989",
+			"birth_place":    "",
+			"join_date":      "03/09/2015",
+			"job":            "Nhân viên kế toán",
+			"position":       "Kế toán viên",
+			"phone":          "0906503700",
+		    "permanent_address":  "Hòa Khánh Nam, Liên Chiểu, Đà Nẵng",
+	        "present_address":    "",
+	        "gender":             "Nữ",
+            "person_id":          "201596799",
+            "person_issued_date": "08/12/2016",
+            "person_place":       "Đà Nẵng",
+            "ethenic":            "Kinh",
+            "education":          "University",
+            "employee_type":      "Staff",
+            "working_status":     "Active",
+            "left_date":          "",
+            "account":            "1008196177",
+            "pit_id":             "",
+            "email":              "",
+            "office_phone":       "",
+            "contract_id":        "15090082/3/HDLD",
+            "social_id":          "4812038932",
+            "health_id":          "Yes",
+        },
+        {
+        	"id": ...
+        }, ...
+    ]
+}

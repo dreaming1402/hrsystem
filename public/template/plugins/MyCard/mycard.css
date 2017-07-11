@@ -1,36 +1,68 @@
 * { margin: 0px; padding: 0px; box-sizing: border-box; }
-.viewer {}
-.viewer .hint {
+#MyCard .viewer {
+	vertical-align: top;
+	padding: 5px 0px 0px 5px;
+	height: auto;
+	position: relative;
+}
+#MyCard .viewer .hint {
     text-align: center;
     margin: 100px auto;
     color: #8a8a8a;
     width: 100%;
+    font-weight: normal;
+    display: inline-block;
+}
+#MyCard .status {
+	font-size: 9px;
+    font-weight: normal;
+    text-align: right;
+    position: absolute;
+    bottom: -13px;
+    right: -6px;
+    color: #919191;
+    margin: 3px;
 }
 
-/* My card */
-.mycard {
+/* Card-size */
+.CR-80 {
 	/* CR-80: 53.98 x 85.6mm */
 	width: 204.018897638px;
 	height: 323.527559055px;
+}
+.CR-80.landscape {	
+	height: 204.018897638px;
+	width: 323.527559055px;
+}
+
+/* My card */
+.mycard-container {
+	width: auto;
+    height: auto;
+    display: inline-block;
+    position: relative;
+    margin: 0px 10px 10px 0px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.3);
+}
+.mycard-render {
+	margin: 0px;
+	padding: 0px;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: 1;
+    width: 100% !important;
+    height: auto !important;
+}
+.mycard {
 	display: block;
 	overflow: hidden;
 	background-color: #fff;
 	position: relative;
-	background-size: 100% auto;
-    box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.7);
+	margin: 0px;
 }
 @media print {
-	.mycard { width: 100% !important; height: 100% !important; box-shadow: none !important; }
-}
-.item canvas.render { 
-	margin: 0px;
-    padding: 0px;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    z-index: 1;
-    width: 100% !important;
-    height: auto !important;
+	.mycard { width: 100% !important; height: 100% !important; }
 }
 .mycard .layer {
 	position: absolute;
@@ -64,13 +96,22 @@
 	text-transform: inherit;
 }
 
+.mycard .print-date {
+    font-weight: bold !important;
+    font-size: 6px !important;
+    margin: 2px auto !important;
+}
+
 .mycard .layer.background {	top: auto; line-height: 0; }
+
+
 .mycard .layer.company-logo { width: 106px; top: 16px; bottom: auto; margin: 0px auto; }
 .mycard .layer.company-slogan {
 	top: auto;
-	color: #fff !important;
+	color: #fff;
     text-transform: capitalize;
     font-size: 9px;
+    bottom: 2px;
 }
 .mycard .layer.company-brand {
     /* display: block;
@@ -82,3 +123,73 @@
     position: absolute;
     top: 100px; right: 40px; left: 40px; */
 }
+
+.mycard-container .control { margin-top: 4px; }
+.mycard-container .control span {
+	padding: 2px;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: #fff;
+    display: inline-block;
+    float: none;
+    margin: 2px;
+}
+.mycard-container .control span i {
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    display: inline-block;
+    cursor: pointer;
+}
+.mycard-container .overlay {
+	position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    display: none;
+    background: rgba(255, 255, 255, 0.6);
+    z-index: 2;
+}
+.mycard-container:hover .overlay { display: block !important; }
+.mycard-container:hover .overlay .control { display: block !important; }
+.mycard-container:hover .overlay .loading { display: none !important; }
+.mycard-container .overlay .loading { width: 30px; height: 30px; line-height: 30px; text-align: center; display: none; margin: auto; }
+.mycard-container .overlay .control span[role="run"] { display: inline-block; }
+.mycard-container .overlay .control span[role="trying"] { display: none; }
+.mycard-container .overlay .control span[role="remove"] { display: inline-block; }
+.mycard-container .overlay .control span[role="delete"] { display: none; }
+
+.mycard-container.rending .overlay { display: block; }
+.mycard-container.rending .overlay .loading { display: block; }
+.mycard-container.rending .overlay .control { display: none; }
+.mycard-container.rending .overlay .control span[role="run"] { display: none; }
+.mycard-container.rending .overlay .control span[role="trying"] { display: none; }
+.mycard-container.rending .overlay .control span[role="remove"] { display: inline-block; }
+.mycard-container.rending .overlay .control span[role="delete"] { display: none; }
+
+.mycard-container.succeed .overlay { display: none; }
+.mycard-container.succeed .overlay .loading { display: none; }
+.mycard-container.succeed .overlay .control { display: block; }
+.mycard-container.succeed .overlay .control span[role="run"] { display: inline-block; }
+.mycard-container.succeed .overlay .control span[role="trying"] { display: none; }
+.mycard-container.succeed .overlay .control span[role="remove"] { display: inline-block; }
+.mycard-container.succeed .overlay .control span[role="delete"] { display: inline-block; }
+
+.mycard-container.failed .overlay { display: block; }
+.mycard-container.failed .overlay .loading { display: none; }
+.mycard-container.failed .overlay .control { display: block; }
+.mycard-container.failed .overlay .control span[role="run"] { display: none; }
+.mycard-container.failed .overlay .control span[role="trying"] { display: inline-block; }
+.mycard-container.failed .overlay .control span[role="remove"] { display: inline-block; }
+.mycard-container.failed .overlay .control span[role="delete"] { display: none; }
+
+.mycard-container.error .overlay { display: block; }
+.mycard-container.error .overlay .loading { display: block; }
+.mycard-container.error .overlay .control { display: none; }
+.mycard-container.error .overlay .control span[role="run"] { display: none; }
+.mycard-container.error .overlay .control span[role="trying"] { display: none; }
+.mycard-container.error .overlay .control span[role="remove"] { display: inline-block; }
+.mycard-container.error .overlay .control span[role="delete"] { display: none; }

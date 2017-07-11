@@ -1,15 +1,12 @@
 <div class="row">
 
-    <section id="alert-area" class="col-md-12">
-    </section><!--alert-area-->
-
-    <section class="col-md-8">
+    <section class="col-md-12">
         <div class="box box-default">
-            <div id="grid_MyCard-management"></div>
+            <div id="grid_<?php echo $page_id;?>"></div>
         </div><!--box-->
     </section><!--col-md-12-->
 
-    <section class="col-md-4">
+    <section class="col-md-12">
         <div class="box box-default">
             <div class="box-header">
                 <i class="fa fa-download"></i>
@@ -17,221 +14,236 @@
             </div><!--box-header-->
         </div><!--box-->
     </section><!--col-md-4-->
-
-    <section class="col-md-4">
-        <div class="box box-default">
-            <div class="box-header">
-                <i class="fa fa-check-square-o"></i>
-                <h3 class="box-title">Thẻ đã chọn</h3>
-            </div><!--box-header-->
-
-            <div class="box-body">
-                <div id="viewer"></div><!--viewer-->
-            </div><!--box-body-->
-
-            <div class="box-footer">                
-                <div id="control">
-                    <div action="employeeCard.downloadAll" class="control-action btn btn-default"><i class="fa fa-download"></i> Tải về</div>
-                    <div class="pull-right">
-                        <span class="btn disabled"><i class="processing fa fa-refresh fa-spin hidden"></i></span>
-                        <div action="employeeCard.printAll" action-data="0" class="control-action btn btn-primary"><i class="fa fa-print"></i> In thẻ được chọn</div>
-                    </div><!--pull-right-->
-                </div><!--control-->
-            </div><!--box-footer-->
-        </div><!--box-->
-    </section><!--col-md-4-->
     
 </div><!--row-->
 <script>
-Fancy.defineTheme('staff', {
-	config: {
-		cellHeight: 60
-	}
-});
+var employeeCard,
+    // get template
+    default_card_template = GetLinkContent('?c=MyCard&a=gettemplate&t=employee'),
+    staff_card_template = GetLinkContent('?c=MyCard&a=gettemplate&t=employee&staff'),
+    pregnancy_card_template = GetLinkContent('?c=MyCard&a=gettemplate&t=employee&pregnancy'),
+    hasbaby_card_template = GetLinkContent('?c=MyCard&a=gettemplate&t=employee&hasbaby'),
 
-var gird_mcm = new FancyGrid({
-	renderTo: 'grid_MyCard-management',
-	title: 'Danh sách in thẻ',
-	theme: 'staff',
+    default_unlimit_card_template = GetLinkContent('?c=MyCard&a=gettemplate&t=employee&unlimit'),
+    staff_unlimit_card_template = GetLinkContent('?c=MyCard&a=gettemplate&t=employee&staff&unlimit'),
+    pregnancy_unlimit_card_template = GetLinkContent('?c=MyCard&a=gettemplate&t=employee&pregnancy&unlimit'),
+    hasbaby_unlimit_card_template = GetLinkContent('?c=MyCard&a=gettemplate&t=employee&hasbaby&unlimit');
+
+Fancy.defineController('conrol_<?php echo $page_id;?>', {
+    onSelect: function(grid) { // done
+        var selection = grid.getSelection(),
+            print_button = grid.tbar[1];
+
+        if (selection.length > 0) {
+            print_button.enable();
+        } else {
+            print_button.disable();
+        };
+    },
+    onClearSelect: function(grid) { // done
+        grid.tbar[1].disable();
+    },
+    onCellClick: function(grid, o) { // done
+        if (o.column.title != 'Tải') return;
+        grid.printCard(o.data);
+    },
+    printCard: function(item) { // done
+        var me = this,
+            printCardForm = me.printCardForm;
+
+        // Set template_name
+        var template_name = [],
+            contract_type = item.contract_type.toLowerCase(),
+            employee_type = item.employee_type.toLowerCase(),
+            employee_department = item.employee_department.toLowerCase(),
+            maternity_type = item.maternity_type.toLowerCase(),            
+            unlimit = ['packing 1', 'packing 2'];
+
+        if (employee_type == 'worker')
+            template_name.push('default');
+        else
+            template_name.push('staff');
+
+        // thẻ bầu và thẻ có con nhỏ không phân biệt employee_type
+        if (maternity_type != 'none')
+            template_name = [maternity_type.ReplaceAll(' ', '')];
+
+        // Kiểm tra quyền truy cập của nhân viên bằng tên bộ phận có trong unlimit[]
+        if ($.inArray(employee_department, unlimit) >= 0)
+            template_name.push('unlimit');
+
+        // Nối lại thành tên hoàn chỉnh có dạng type_unlimit
+        template_name = template_name.join('_');
+
+        // Kiểm tra đã tạo form in thì bỏ qua bước tạo obj
+        if (printCardForm) {
+            // Xóa thẻ nếu có
+            employeeCard.Clear();
+
+            // Thêm mới thẻ được chọn
+            employeeCard.AddCard(item, template_name);
+
+            // Cập nhập form
+            printCardForm.set('print_card_id', item.employee_id);
+            printCardForm.set(item);
+
+            // Hiển thị form
+            printCardForm.show();
+        } else {
+            // Tạo form in thẻ mới nếu được kick hoạt lần đầu
+            printCardForm = new FancyForm({
+                title: {
+                    text: 'In thẻ nhân viên',
+                    tools: [
+                        {
+                            text: 'Đóng',
+                            handler: function() {
+                                this.hide();
+                            }
+                        }
+                    ]
+                },
+                theme: 'blue',
+                window: true,
+                modal: true,
+                draggable: true,
+                width: 500,
+                height: 'fit',
+                method: 'POST',
+                buttons: ['side',
+                    {
+                        text: 'Đóng',
+                        handler: function() {
+                            this.hide();
+                        }
+                    },
+                    {
+                        text: 'Tải về',
+                        handler: function() {
+                            if (this.get('print_card_type') == '') {
+                                alert('Chọn loại thẻ cần in');
+                                return;
+                            };
+                            if (this.get('print_description') == '') {
+                                alert('Cần ghi chú lại lần in này với lý do gì');
+                                return;
+                            };
+
+                            employeeCard.DownloadCardAll();
+                            this.submit();
+                            this.hide();
+                        }
+                    }
+                ],
+                events: [{
+                    init: function() {
+                        // Fill all fields
+                        this.set(item);
+
+                        // Hiển thị form
+                        this.show();
+                    }
+                }],
+
+                <?php echo FancyformParse($fancyform); ?>
+            });
+
+            me.printCardForm = printCardForm;
+
+            // Chèn vào form in thẻ
+            $('.print-viewer .fancy-field-set-items').prepend('<div id="MyCard"></div>');
+
+            // Khởi tạo plugin MyCard
+            employeeCard = new MyCard({
+                debug: false,
+                namespace: 'employeeCard',
+                cardTemplates: {
+                    default: default_card_template,
+                    staff: staff_card_template,
+                    pregnancy: pregnancy_card_template,
+                    hasbaby: hasbaby_card_template,
+
+                    default_unlimit: default_unlimit_card_template,
+                    staff_unlimit: staff_unlimit_card_template,
+                    pregnancy_unlimit: pregnancy_unlimit_card_template,
+                    hasbaby_unlimit: hasbaby_unlimit_card_template,
+                },
+            });
+
+            employeeCard.AddCard(item, template_name);
+        };
+
+        // Clear những field cần nhập
+        me.printCardForm.set('print_description', '');
+
+        // Nếu đang thử việc lựa chọn mặc định thẻ giấy
+        if (contract_type == 'probation')
+            me.printCardForm.set('print_card_type', 'Thẻ giấy');
+        else if (maternity_type == 'pregnancy')
+            me.printCardForm.set('print_card_type', 'Thẻ bầu');
+        else if (maternity_type == 'has baby')
+            me.printCardForm.set('print_card_type', 'Thẻ con nhỏ');
+        else
+            me.printCardForm.set('print_card_type', '');
+    },
+});
+var gird_<?php echo $page_id;?> = new FancyGrid({
+    title: 'Danh sách in thẻ',
+	renderTo: 'grid_<?php echo $page_id;?>',
+	theme: 'blue',
 	height: 600,
 	trackOver: true,
 	selModel: 'rows',
-	columnLines: false,
-	columnClickData: true,
 	paging: {
         pageSize: 50,
         pageSizeData: [50,100,150,200]
 	},
-	defaults: {
-		type: 'string',
-		sortable: true,
-		resizable: true,
-		editable: false,
-		vtype: 'notempty',
-		ellipsis: true,
-		filter: {
-			header: true,
-			emptyText: 'Tìm kiếm'
-		},
-		width: 120,
-        menu: true,
-	},
-
-    tbar: [{
-        text: 'Xuất ra Excel',
-        handler: function() {
-            fancygrid_2_csv('#grid_MyCard-management', '<?php echo $page_title; ?>.csv');
+    controllers: ['conrol_<?php echo $page_id;?>'],    
+    tbar: [
+        {
+            type: 'search',
+            width: 350,
+            emptyText: 'Tìm kiếm thông tin bất kỳ',
+            tip: 'Nhập thông tin',
+            paramsMenu: true,
+            paramsText: 'Cài đặt'
+        },
+        {
+            text: 'Tải xuống thẻ được chọn',
+            tip: 'Bôi đen các hàng để in nhiều người',
+            disabled: true,
+            handler: function(){
+                this.clearFilter();
+                console.log(this.get('employee_gender'));
+            }
+        },
+        {
+            text: 'Xóa bộ lọc',
+            handler: function(){
+                this.clearFilter();
+                console.log(this.get('employee_gender'));
+            }
+        },
+        {
+            text: 'Xuất ra Excel',
+            tip: 'Tạm thời chỉ xuất được file .csv, upload mở trong Google Drive để đọc được chữ tiếng Việt',
+            handler: function() {
+                FancygridToCsv('#grid_<?php echo $page_id;?>', '<?php echo $page_title; ?>.csv');
+            }
         }
-    }],
-
-	events: [{
-        rowclick: function(grid, e) {
-            var selecteds = grid.getSelection();
-            if (selecteds.length)
-                employeeCard.clear();
-
-            $.each(selecteds, function() {
-                employeeCard.addItem(this);
-            });
-        }
-    }],
+    ],
+	events: [
+        { select: 'onSelect' },
+        { clearselect: 'onClearSelect' },
+        { cellclick: 'onCellClick' },
+    ],
 	data: {
 		proxy: {
 			api: {
 				read: 	'?c=Employee&a=getPrintList',
 			}
 		}
-	},
-<?php echo fancygrid_columns($fancygrid['columns']); ?>
-});
-
-var employee_card_template = get_link_content('?c=MyCard&a=gettemplate&t=employee'),
-    employee_staff_card_template = get_link_content('?c=MyCard&a=gettemplate&t=employee&staff'),
-    employee_hasbaby_card_template = get_link_content('?c=MyCard&a=gettemplate&t=employee&hasbaby'),
-    employee_pregnant_card_template = get_link_content('?c=MyCard&a=gettemplate&t=employee&pregnant'),
-
-    employee_unlimit_card_template = get_link_content('?c=MyCard&a=gettemplate&t=employee&unlimit'),
-    employee_staff_unlimit_card_template = get_link_content('?c=MyCard&a=gettemplate&t=employee&staff&unlimit'),
-    employee_hasbaby_unlimit_card_template = get_link_content('?c=MyCard&a=gettemplate&t=employee&hasbaby&unlimit'),
-    employee_pregnant_unlimit_card_template = get_link_content('?c=MyCard&a=gettemplate&t=employee&pregnant&unlimit');
-
-function to_employee_card(o) {
-    var employee = o,
-
-        employee_id = o.employee_id,
-        employee_full_name = o.full_name,
-        employee_position = o.position,
-        employee_department = o.department,
-        employee_type = o.employee_type,
-        employee_contract_id = o.contract_id,
-
-        maternity_type = o.db_maternity_maternity_type,
-        maternity_begin = o.db_maternity_maternity_begin,
-        maternity_end = o.db_maternity_maternity_end,
-
-        template = '',
-        unlimit = ['packing 1', 'packing 2'];
-
-    if ($.inArray(employee_department.toLowerCase(), unlimit) >= 0) {
-        // unlimit template
-        if (maternity_type.toLowerCase() == 'pregnancy') {
-            template = employee_pregnant_unlimit_card_template;
-        } else if (maternity_type.toLowerCase() == 'has baby') {
-            template = employee_hasbaby_unlimit_card_template;
-        } else {
-            if (employee_type.toLowerCase() == 'staff') {
-                template = employee_staff_unlimit_card_template;
-            } else {
-                template = employee_unlimit_card_template;
-            }
-        }
-    } else {
-        if (maternity_type.toLowerCase() == 'pregnancy') {
-            template = employee_pregnant_card_template;
-        } else if (maternity_type.toLowerCase() == 'has baby') {
-            template = employee_hasbaby_card_template;
-        } else {
-            if (employee_type.toLowerCase() == 'staff') {
-                template = employee_staff_card_template;
-            } else {
-                template = employee_card_template;
-            }
-        }
-    }
-
-
-    employee_card = template;
-    employee_card = employee_card.replaceAll('{print_card_id}', employee_id);
-
-    employee_card = employee_card.replaceAll('{img-src}', 'src="?c=employeeImage&a=view&id={employee_id}"');
-    employee_card = employee_card.replaceAll('{employee_department}', employee_department);
-    employee_card = employee_card.replaceAll('{employee_id}', employee_id);
-    employee_card = employee_card.replaceAll('{employee_full_name}', employee_full_name);
-    employee_card = employee_card.replaceAll('{employee_type}', employee_type);
-    employee_card = employee_card.replaceAll('{employee_position}', employee_position);
-
-    employee_card = employee_card.replaceAll('{employee_contract_id}', employee_contract_id);
-
-    employee_card = employee_card.replaceAll('{maternity_type}', maternity_type);
-    employee_card = employee_card.replaceAll('{maternity_begin}', maternity_begin);
-    employee_card = employee_card.replaceAll('{maternity_end}', maternity_end);
-    //employee_card = employee_card.replaceAll('{slogan}', 'Word Class Apparel Leader');
-
-    var print_description = prompt("Nhập giải thích cho lần in này ("+employee_id+" - "+employee_full_name+")", "");
-    if (print_description == "" || print_description == null)
-        return false;
-
-    employee_card = employee_card.replaceAll('{print_description}', print_description);
-
-    return employee_card;
-}
-
-function after_employee_card_print(item) {
-    var mycard = $(item).find('.mycard'),
-
-        print_card_id = mycard.attr('id'),
-        print_description = mycard.attr('description'),
-        print_date = mycard.attr('date'),
-
-        employee_department = mycard.attr('employee_department'),
-        employee_id = mycard.attr('employee_id'),
-        employee_full_name = mycard.attr('employee_full_name'),
-        employee_position = mycard.attr('employee_position'),
-        employee_type = mycard.attr('employee_type'),
-        employee_contract_id = mycard.attr('employee_contract_id'),
-
-        maternity_type = mycard.attr('maternity_type'),
-        maternity_begin = mycard.attr('maternity_begin'),
-        maternity_end = mycard.attr('maternity_end'),
-
-        ajax = $.ajax({
-            method: 'POST',
-            data: {
-                print_card_id: print_card_id,
-                print_description: print_description,
-                print_date: print_date,
-
-                employee_department: employee_department,
-                employee_id: employee_id,
-                employee_full_name: employee_full_name,
-                employee_position: employee_position,
-                employee_type: employee_type,
-                employee_contract_id: employee_contract_id,
-
-                maternity_type: maternity_type,
-                maternity_begin: maternity_begin,
-                maternity_end: maternity_end,
-            },
-        });
-}
-
-var employeeCard = new MyCard({
-    renderTo: '#viewer',
-    autoRending: false,
-    toCard: 'to_employee_card',
-    namespace: 'employeeCard',
-    afterPrint: 'after_employee_card_print',
-    afterDownload: 'after_employee_card_print',
-    hint: 'Chưa có nhân viên nào được chọn',
+	},   
+<?php echo FancygridParse($fancygrid); ?>
 });
 </script>

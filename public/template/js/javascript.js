@@ -1,47 +1,27 @@
-$(document).ready(function(){
+// Helper
 
-    $('.match').on('click', function() {
-        $id = $(this).parent().attr('id');
-        $.ajax({
-            method: "GET",
-            url: "copy.php",
-            data: { id: $id }
-        }).done(function( msg ) {
-            $('.box#' + $id).html(msg);
-        });
-    });
+// Hỗ trợ replace tất cả text có trong chuỗi
+String.prototype.ReplaceAll = function(search, replacement) { var target = this; return target.split(search).join(replacement); };
 
-    
-});
+// Chuyển dữ liệu row của bảng thành array
+function TrToArray(_tr) { var result = []; $(_tr).find('td').each(function() { result.push($(this).html()); }); return result; }
 
-String.prototype.replaceAll = function(search, replacement) { var target = this; return target.split(search).join(replacement); };
-function tr_to_array(tr) { result = []; $(tr).find('td').each(function() { result.push($(this).html()); }); return result; }
-function message(message, showAlert = true) { console.log(message); if(showAlert) alert(message); }
+// Hiển tị tin nhắn và console log
+function ShowMessage(_message, _showAlert = true) { console.log(_message); if(_showAlert) alert(_message); }
 
-function get_file_name(file_path) { return file_path.split('\\').pop().split('/').pop(); }
-function get_file_extension(file_path) { return file_path.split('.').pop(); }
-function get_file_id(file_path) {
-    /*var file_id = file_name.replaceAll('.' + get_file_extension(file_name), '');
-    file_id = file_id.replaceAll(' ', '-'); // replace space by -
-    file_id = file_id.replaceAll('.', '_'); // replace . by _
-    return file_id;//.toLowerCase();*/
-    return get_file_name(file_path).replaceAll('.'+get_file_extension(file_path), '');
-}
-/*function render_image(file, view) {
-    var oFReader = new FileReader();
-    oFReader.readAsDataURL(file);
-    oFReader.onload = function (oFREvent) {
-        $(view).attr('src', oFREvent.target.result).fadeIn();
-    };
-}*/
+// Lấy thông tin file
+function GetFileName(_file_path) { return _file_path.split('\\').pop().split('/').pop(); }
+function GetFileExtension(_file_path) { return _file_path.split('.').pop(); }
+function GetFileId(_file_path) { return GetFileName(_file_path).ReplaceAll('.'+GetFileExtension(_file_path), ''); }
 
-function syntaxHighlight(json) {
-    var json = JSON.stringify(json, null, '\t'),
+// Makeup json
+function SyntaxHighlight(_json) {
+    _json = JSON.stringify(_json, null, '\t'),
         style = $('#syntaxHighlight');
     if (style.length <= 0)
       $('body').prepend('<style id="syntaxHighlight">.string { color: green; }.number { color: darkorange; }.boolean { color: blue; }.null { color: magenta; }.key { color: red; }</style>');
-    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+    _json = _json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return _json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
         var cls = 'number';
         if (/^"/.test(match)) {
             if (/:$/.test(match)) {
@@ -57,16 +37,18 @@ function syntaxHighlight(json) {
         return '<span class="' + cls + '">' + match + '</span>';
     });
 }
-function phoneInputFn(value) {
-  var value = parseInt(value.replace(/\-/g, ''));
 
-  if (isNaN(value)) {
-    value = '';
+// Định dạng số điện thoại
+function PhoneInputFn(_value) {
+  var _value = parseInt(_value.replace(/\-/g, ''));
+
+  if (isNaN(_value)) {
+    _value = '';
   } else {
-    value = String(value);
+    _value = String(_value);
   }
 
-  switch (value.length) {
+  switch (_value.length) {
     case 0:
     case 1:
     case 2:
@@ -74,62 +56,186 @@ function phoneInputFn(value) {
     case 4:
     case 5:
     case 6:
-      value = value.replace(/^(\d{3})/, "$1-");
+      _value = _value.replace(/^(\d{3})/, "$1-");
       break;
     case 7:
     case 8:
     case 9:
-      value = value.replace(/^(\d{3})(\d{3})/, "$1-$2-");
+      _value = _value.replace(/^(\d{3})(\d{3})/, "$1-$2-");
       break;
     case 10:
-      value = value.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
+      _value = _value.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
       break;
     default:
-      value = value.substr(0, 10);
-      value = value.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
+      _value = _value.substr(0, 10);
+      _value = _value.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
   }
 
-  return value;
+  return _value;
 }
-function salaryInputFn(value) {
-  var value = value.toString().replace('$', '').replace(/\,/g, '').replace('-', '').replace('.', '');
 
-  if (value.length === 0) {
-    value = '';
-  } else if (value.length > 6) {
-    value = value.substr(0, 6);
-    value = '$' + value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+// Định dạng tiền
+function SalaryInputFn(_value, _currency = '$') {
+  // Loại bỏ các ký tự đặc biệt
+  _value = _value.toString().replace(_currency, '').replace(/\,/g, '').replace('-', '').replace('.', '');
+
+  if (_value.length === 0) {
+    _value = '';
+  } else if (_value.length > 6) {
+    _value = _value.substr(0, 6);
+    _value = _currency + _value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   } else {
-    value = '$' + value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    _value = _currency + _value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
 
   return value;
 }
-function formatBytes(bytes, decimals = 0) {
-  if(bytes == 0) return '0 Byte';
+
+// Lọc Fancygrid by fancyfrom field
+var StringFilterFn = function(field, value, oldValue){
+    if(field.interval){
+        clearInterval(field.interval);
+    }
+
+    field.interval = setTimeout(function(){
+        var grid = FancyGrid.get('grid_MyCard-management');
+
+        grid.addFilter(field.name, value);
+    }, 500);
+};
+var StringByKeyFilterFn = function(field, value, oldValue){
+    if(field.interval){
+        clearInterval(field.interval);
+    }
+
+    field.interval = setTimeout(function(){
+        var grid = FancyGrid.get('grid_MyCard-management');
+
+        grid.addFilter(field.name+'_by_key', value);
+    }, 500);
+};
+var DateFromFilterFn = function(field, value, oldValue){
+    if(field.interval){
+        clearInterval(field.interval);
+    }
+
+    field.interval = setTimeout(function(){
+        var grid = FancyGrid.get('grid_MyCard-management');
+
+        grid.addFilter(field.name, Fancy.Date.parse(value, 'Y-m-d'), '>=');
+    }, 500);
+};
+var DateTillFilterFn = function(field, value, oldValue){
+    if(field.interval){
+        clearInterval(field.interval);
+    }
+
+    field.interval = setTimeout(function(){
+        var grid = FancyGrid.get('grid_MyCard-management');
+
+        grid.addFilter(field.name, Fancy.Date.parse(value, 'Y-m-d'), '<=');
+    }, 500);
+};
+var NumberFilterFn = function(field, value, oldValue){
+    if(field.interval){
+        clearInterval(field.interval);
+    }
+
+    field.interval = setTimeout(function(){
+        var grid = FancyGrid.get('grid_MyCard-management');
+
+        grid.addFilter(field.name, '');
+        if (field.value == '')
+            grid.clearFilter(field.name);
+        else if (field.value == 'No') {
+            //grid.clearFilter(field.name);
+            grid.addFilter(field.name,'0', '=');
+        }
+        else {            
+            //grid.clearFilter(field.name);
+            grid.addFilter(field.name, value, '=');
+        }
+
+    }, 500);
+};
+var NumberFromFilterFn = function(field, value, oldValue){
+    if(field.interval){
+        clearInterval(field.interval);
+    }
+
+    field.interval = setTimeout(function(){
+        var grid = FancyGrid.get('grid_MyCard-management');
+
+        grid.addFilter(field.name, '');
+        if (field.value == '')
+            grid.clearFilter(field.name);
+        else if (field.value == '0') {
+            grid.clearFilter(field.name);
+            grid.addFilter(field.name,'0', '=');
+        }
+        else{            
+            grid.clearFilter(field.name);
+            grid.addFilter(field.name, value, '>=');
+        }
+    }, 500);
+};
+var NumberTillFilterFn = function(field, value, oldValue){
+    if(field.interval){
+        clearInterval(field.interval);
+    }
+
+    field.interval = setTimeout(function(){
+        var grid = FancyGrid.get('grid_MyCard-management');
+
+        grid.addFilter(field.name, '');
+        if (field.value == '')
+            grid.clearFilter(field.name);
+        else if (field.value == '0') {            
+            grid.clearFilter(field.name);
+            grid.addFilter(field.name, '0', '=');
+        }
+        else {
+            grid.clearFilter(field.name);
+            grid.addFilter(field.name, value, '<=');
+        }
+    }, 500);
+};
+
+// Định dạng bytes
+function FormatBytes(_bytes, _decimals = 0) {
+  if(_bytes == 0) return '0 Byte';
   var k = 1000,
-      dm = decimals + 1 || 3,
+      dm = _decimals + 1 || 3,
       sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
-      i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+      i = Math.floor(Math.log(_bytes) / Math.log(k));
+  return parseFloat((_bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
-function get_link_content(link) {
+
+// Định dạng ngày Y-m-d H:M:s thành int
+function FormatDate(_dateString) {
+  var date = new Date(_dateString);
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0,0,0,0).getTime().toString();
+}
+
+
+// Lấy nội dung trang web
+function GetLinkContent(_link) {
   var response = '',
       ajax = $.ajax({
-          url: link,
+          url: _link,
           async: false,
           success: function(data) { response = data; },
       });
   return response;
 }
 
-function upload_file(form, callback = null) {
-  var server = form.attr('action'),
-      files = form.find('input:file')[0].files;
+function upload_file(_form, _callback = null) {
+  var server = _form.attr('action'),
+      files = _form.find('input:file')[0].files;
   if (!files.length)
     return false;
 
-  var processing = form.find('.processing'),
+  var processing = _form.find('.processing'),
       formData = new FormData();
   formData.append('file', files[0]);
  
@@ -142,29 +248,28 @@ function upload_file(form, callback = null) {
       processData: false,
       beforeSend: function(jqXHR, settings) {
         if (processing.length)
-          form.append('<i class="processing fa fa-refresh fa-spin"></i>');
+          _form.append('<i class="processing fa fa-refresh fa-spin"></i>');
         else
-          form.find('.processing').removeClass('hidden');
+          _form.find('.processing').removeClass('hidden');
       },
       success: function(data, textStatus, jqXHR) {
-        if (callback != null)
-          window[callback](data);
+        if (_callback != null)
+          window[_callback](data);
       },
       error: function(jqXHR, textStatus, errorThrown) {
           console.log(errorThrown);
       },
       complete: function(jqXHR, textStatus) {
-        form.find('.processing').addClass('hidden');
+        _form.find('.processing').addClass('hidden');
         console.log({action:'upload_file: '+server, file: files[0].name, status: textStatus});
       }
   });
 }
-
-function delete_file(server, file, callback = null) {
+function delete_file(_server, _file, _callback = null) {
   $.ajax({
-      url: server,
+      url: _server,
       method: 'POST',
-      data: {id:'"'+file+'"'},
+      data: {id:'"'+_file+'"'},
       cache: false,
       contentType: false,
       processData: false,
@@ -172,8 +277,8 @@ function delete_file(server, file, callback = null) {
         $('.processing').attr('class', 'processing fa fa-refresh fa-spin');
       },
       success: function(data, textStatus, jqXHR) {
-        if (callback != null)
-          window[callback](data);
+        if (_callback != null)
+          window[_callback](data);
       },
       error: function(jqXHR, textStatus, errorThrown) {
         $('.message').attr('class', 'message text-red');
@@ -188,12 +293,13 @@ function delete_file(server, file, callback = null) {
   });
 }
 
-function fancygrid_2_csv(grid_id, file_name) {
-  var header_length = $(grid_id).find('.fancy-grid-header-cell-text').length,
-      col_length = $(grid_id).find('.fancy-grid-column').length,
-      cel_length = $(grid_id).find('.fancy-grid-cell').length,
-      header = $(grid_id).find('.fancy-grid-header-cell-text'),
-      data = $(grid_id).find('.fancy-grid-cell'),
+// Tạo file CSV từ Fancygrid
+function FancygridToCsv(_gridId, _fileName) {
+  var header_length = $(_gridId).find('.fancy-grid-header-cell-text').length,
+      col_length = $(_gridId).find('.fancy-grid-column').length,
+      cel_length = $(_gridId).find('.fancy-grid-cell').length,
+      header = $(_gridId).find('.fancy-grid-header-cell-text'),
+      data = $(_gridId).find('.fancy-grid-cell'),
       tmp = [],
       rows_total = cel_length/col_length,
       row_index = 1;
@@ -214,13 +320,13 @@ function fancygrid_2_csv(grid_id, file_name) {
     }
   })
 
-  //$('#down').attr('href', make_text_file(tmp.join('\n')));
+  //$('#down').attr('href', CreateTextFile(tmp.join('\n')));
 
-  make_text_file(tmp.join('\n'), true)
+  CreateTextFile(tmp.join('\n'), true)
 
-  function make_text_file(text, auto_download = false) {
+  function CreateTextFile(_text, _autoDownload = false) {
     var text_file = null,
-      data = new Blob([text], {type: 'text/csv;charset=utf-8;'});
+        data = new Blob([_text], {type: 'text/csv;charset=utf-8;'});
 
     // If we are replacing a previously generated file we need to
     // manually revoke the object URL to avoid memory leaks.
@@ -230,14 +336,14 @@ function fancygrid_2_csv(grid_id, file_name) {
 
     text_file = window.URL.createObjectURL(data);
 
-    if (auto_download)
-      saveAs(data, file_name);
+    if (_autoDownload)
+      saveAs(data, _fileName);
 
     return text_file;
   };
 }
 
-
+// Hàm gọi event bằng function name
 function execute_function_by_name(functionName, context, args = []) {
     var args = args.slice.call(arguments).splice(2),
         namespaces = functionName.split("."),
@@ -250,8 +356,59 @@ function execute_function_by_name(functionName, context, args = []) {
     return context[func].apply(context, args);
 }
 
+// Fix fancygird datetime filter by fancyform field
+Fancy.Grid.prototype.addFilter1 = function(index, value, sign){
+  var me = this,
+    filter = me.filter.filters[index],
+    sign = sign || '';
+
+  if(filter === undefined){
+    filter = {};
+  }
+
+  if(Fancy.isDate(value)){
+    filter['type'] = 'date';
+    filter['format'] = this.lang.date;
+    /*filter['format']['read'] = "Y-m-d";
+    filter['format']['write'] = "d-m-Y";
+    filter['format']['edit'] = "Y-m-d";*/
+    value = Number(value);
+  }
+
+  if(value === ''){
+    delete filter[sign];
+  }
+  else{
+    filter[sign] = value;
+  }
+
+  me.filter.filters[index] = filter;
+  me.filter.updateStoreFilters();
+};
+// Fix data list for combo col
+Fancy.form.field.Combo.prototype.loadListData1 = function() {
+  var a = this;
+  if (Fancy.isObject(a.data)) {
+    var b = a.data.proxy;
+    if (!b || !b.url)
+      throw new Error("[FancyGrid Error]: combo data url is not defined");
+    Fancy.Ajax({
+      url: b.url,
+      params: b.params || {},
+      method: b.method || "GET",
+      getJSON: !0,
+      success: function(b) {
+        a.data = a.configData(b.data),
+        a.renderList(),
+        a.onsList()
+      }
+    })
+  }
+};
+
 $(document).ready(function() {
-  // helper
+  // Gọi event bằng class .control-action
+  // Ex: <a class="control-action" action="file.upload" data="url">Click me</a>
   $('body').on('click', '.control-action', function() {
       var action = $(this).attr('action'),
           data = $(this).attr('action-data'); //option1

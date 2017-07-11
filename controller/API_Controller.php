@@ -10,27 +10,32 @@ class API_Controller extends Base_Controller
 		$this->model->load('API');
     }
 
-    public function getAction()	{
+    public function getAction()	{ // done
+    	$sql = [
+    		'select'=> [],
+    		'from'	=> DB_PREFIX.$_GET['t'],	
+    	];
+
 		$data = [
 			'response' => [
 				'success'	=> true,
-				'data'		=> $this->model->API->get_table($_GET['t']),
+				'data'		=> $this->model->API->get_table($sql),
 			],
 		];
 
 		$this->view->load('json', $data);
 	}
 
-	public function newAction() {
-        $tmp['id'] = 'Temp'.rand(1,100);
+	public function newAction() { // done
+        $sql['id'] = 'temp'.rand(1,100);
 
-        $result = $this->model->API->new_row($_GET['t'], $tmp);
+        $result = $this->model->API->new_row($_GET['t'], $sql);
 
     	if ($result) {
     		$data = [
 	    		'response' => [
 					'success' => true,
-	    			'message' => 'Create was successful',
+	    			'message' => 'Đã tạo thành công id="'.$result.'"',
 	    			'data' => [
 	    				'id' => $result,
 	    			]
@@ -40,9 +45,9 @@ class API_Controller extends Base_Controller
     		$data = [
 	    		'response' => [
 					'success' => false,
-	    			'message' => 'The "'.$tmp['id'].'" not available',
+	    			'message' => 'Tạo mới không thành công',
 	    			'data' => [
-	    				'id' => $tmp['id'],
+	    				'id' => $sql['id'],
 	    			],
 	    		]
 	    	];
@@ -51,8 +56,16 @@ class API_Controller extends Base_Controller
     	$this->view->load('json', $data);
 	}
 
-	public function editAction() {
-        $result = $this->model->API->edit_row($_GET['t'], [$_GET['key']=>$_GET['value']], 'id='. $_GET['id']);
+	public function editAction() { // done
+		$sql['data'] = [
+			$_GET['key'] => $_GET['value'],
+		];
+
+		$sql['where'] = [
+			'id' => $_GET['id'],
+		];
+
+        $result = $this->model->API->edit_row($_GET['t'], $sql['data'], $sql['where']);
 
         if ($result) {
     		$data = [
@@ -79,8 +92,16 @@ class API_Controller extends Base_Controller
     	$this->view->load('json', $data);
 	}
 
-	public function removeAction() {
-		$result = $this->model->API->edit_row($_GET['t'], [str_replace('enum_', '', str_replace('db_', '', $_GET['t'])).'_trash_flag'=>true], 'id='. $_GET['id']);
+	public function removeAction() { // done
+		$sql['data'] = [
+			str_replace('enum_', '', str_replace('db_', '', $_GET['t'])).'_trash_flag' => true,
+		];
+
+		$sql['where'] = [
+			'id' => $_GET['id'],
+		];
+
+        $result = $this->model->API->edit_row($_GET['t'], $sql['data'], $sql['where']);
 
 		if ($result) {
     		$data = [
@@ -96,7 +117,7 @@ class API_Controller extends Base_Controller
     		$data = [
 	    		'response' => [
 					'success' => false,
-	    			'message' => 'Không thể xóa id="'.$_GET['id'].', vui lòng thử lại',
+	    			'message' => 'Không tìm thấy id="'.$_GET['id'].'"',
 	    			'data' => [],
 	    		]
 	    	];
@@ -105,8 +126,10 @@ class API_Controller extends Base_Controller
     	$this->view->load('json', $data);
 	}
 
-	public function deleteAction() {
-		$result = $this->model->API->delete_row($_GET['t'], 'id='. $_GET['id']);
+	public function deleteAction() { // done
+		$sql['id'] = $_GET['id'];
+
+		$result = $this->model->API->delete_row($_GET['t'], $sql);
 
     	if ($result) {
     		$data = [
@@ -122,7 +145,7 @@ class API_Controller extends Base_Controller
     		$data = [
 	    		'response' => [
 					'success' => false,
-	    			'message' => 'Không thể xóa id="'.$_GET['id'].', vui lòng thử lại',
+	    			'message' => 'Không tìm thấy id="'.$_GET['id'].'"',
 	    			'data' => [],
 	    		]
 	    	];
@@ -130,5 +153,4 @@ class API_Controller extends Base_Controller
 
     	$this->view->load('json', $data);
 	}
-	
 }

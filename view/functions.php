@@ -44,8 +44,8 @@ if (!function_exists('setup_site')) {
 		],
 
 		'fancygrid'	=> [
-			'css'	=> [TEMPLATE_DIR . '/plugins/fancygrid/1.5.0/fancy.min.css'],
-			'js'	=> [TEMPLATE_DIR . '/plugins/fancygrid/1.5.0/fancy.full.min.js'],
+			'css'	=> [TEMPLATE_DIR . '/plugins/fancygrid/1.6.0/fancy.min.css'],
+			'js'	=> [TEMPLATE_DIR . '/plugins/fancygrid/1.6.0/fancy.full.min.js'],
 		],
 
 		'fine-uploader' => [

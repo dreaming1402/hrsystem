@@ -53,10 +53,6 @@
 }
 
 /* Employee staff */
-.mycard.employee.staff {
-	height: 204.018897638px;
-	width: 323.527559055px;
-}
 .mycard.employee.staff .company-logo {
 	top: auto; left: 170px; bottom: 27px; right: auto;
     margin: 0px;
@@ -76,48 +72,40 @@
     width: 70px;
 }
 
-/* Employee pregnant */
-.mycard.employee.pregnant {
-	height: 204.018897638px;
-	width: 323.527559055px;
-}
-.mycard.employee.pregnant .company-logo {
-	top: 15px; right: auto; bottom: auto; left: 26px;
+/* Employee pregnancy */
+.mycard.employee.pregnancy .company-logo {
+	top: 15px; right: auto; bottom: auto; left: 21px;
 	margin: 0px;
 }
-.mycard.employee.pregnant .company-slogan {
-	top: auto; right: auto; bottom: 2px; left: 18px;
+.mycard.employee.pregnancy .company-slogan {
+	top: auto; right: auto; bottom: 2px; left: 13px;
 	color: #146eb4;
 }
-.mycard.employee.pregnant .employee-image {
-	top: 40px; right: auto; bottom: auto; left: 28px;
+.mycard.employee.pregnancy .employee-image {
+	top: 40px; right: auto; bottom: auto; left: 22px;
 	margin: 0px;
 }
-.mycard.employee.pregnant .employee-detail { top: 57px; right: 0px; bottom: auto; left: 124px; }
-.mycard.employee.pregnant .employee-detail p { color: #000; }
-.mycard.employee.pregnant .unlimit {
+.mycard.employee.pregnancy .employee-detail { top: 57px; right: 0px; bottom: auto; left: 124px; }
+.mycard.employee.pregnancy .employee-detail p { color: #000; }
+.mycard.employee.pregnancy .unlimit {
 	top: 147px; right: auto; bottom: auto; left: 70px;
     width: 70px;
 }
-.mycard.employee.pregnant .datelimit {
+.mycard.employee.pregnancy .datelimit {
 	top: auto; right: 0px; bottom: auto; left: auto;
 }
 
 /* Employee hasbaby */
-.mycard.employee.hasbaby {
-	height: 204.018897638px;
-	width: 323.527559055px;
-}
 .mycard.employee.hasbaby .company-logo {
-	top: 15px; right: auto; bottom: auto; left: 26px;
+	top: 15px; right: auto; bottom: auto; left: 21px;
 	margin: 0px;
 }
 .mycard.employee.hasbaby .company-slogan {
-	top: auto; right: auto; bottom: 2px; left: 18px;
+	top: auto; right: auto; bottom: 2px; left: 13px;
 	color: #146eb4;
 }
 .mycard.employee.hasbaby .employee-image {
-	top: 40px; right: auto; bottom: auto; left: 28px;
+	top: 40px; right: auto; bottom: auto; left: 22px;
 	margin: 0px;
 }
 .mycard.employee.hasbaby .employee-detail { top: 57px; right: 0px; bottom: auto; left: 124px; }
@@ -146,13 +134,13 @@
 .mycard.back.employee.staff .company-logo { position: absolute; top: auto; right: 80px; bottom: 85px; left: auto; }
 .mycard.back.employee.staff .text { color: #fff; margin: 5px 20px; }
 
-.mycard.back.employee.pregnant {
+.mycard.back.employee.pregnancy {
 	width: 6.76in; /* 3.38in; */
 	height: 4.28in; /* 2.14in; */
 }
-.mycard.back.employee.pregnant .background { width: 100%; top: auto; right: 0px; bottom: 0px; left: 0px; }
-.mycard.back.employee.pregnant .company-logo { position: absolute; top: auto; right: 80px; bottom: 85px; left: auto; }
-.mycard.back.employee.pregnant .text { color: #000; margin: 5px 20px; }
+.mycard.back.employee.pregnancy .background { width: 100%; top: auto; right: 0px; bottom: 0px; left: 0px; }
+.mycard.back.employee.pregnancy .company-logo { position: absolute; top: auto; right: 80px; bottom: 85px; left: auto; }
+.mycard.back.employee.pregnancy .text { color: #000; margin: 5px 20px; }
 
 .mycard.back.employee.hasbaby {
 	width: 6.76in; /* 3.38in; */
