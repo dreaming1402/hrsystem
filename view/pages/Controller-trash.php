@@ -2,21 +2,21 @@
 
     <section id="alert-area" class="col-md-12">
     </section><!--alert-area-->
-    
-	<section class="col-md-12">
+
+    <section class="col-md-12">
         <div class="box box-default">
             <div id="grid_<?php echo $page_id; ?>"></div>
         </div><!--box-->
     </section><!--col-md-12-->
-    
+
 </div><!--row-->
 
 <script>
-Fancy.defineController('grid_controller', {
+Fancy.defineController('controller_<?php echo $page_id; ?>', {
 	onSelect: function(grid) {
 		var selection = grid.getSelection(),
-		restoreButton = grid.tbar[0];
-		permanentlyDeleteButton = grid.tbar[1];
+		restoreButton = grid.tbar[1];
+		permanentlyDeleteButton = grid.tbar[2];
 
 		if (selection.length >= 1) {
 			restoreButton.enable();
@@ -27,8 +27,8 @@ Fancy.defineController('grid_controller', {
 		}
 	},
 	onClearSelect: function(grid) {
-		grid.tbar[0].disable();
 		grid.tbar[1].disable();
+		grid.tbar[2].disable();
 	},
 	restoreFromTrash: function(item) {
 		$.ajax({
@@ -61,72 +61,63 @@ Fancy.defineController('grid_controller', {
 });
 
 var grid_<?php echo $page_id; ?> = new FancyGrid({
-	renderTo: 'grid_<?php echo $page_id; ?>',
 	title: '<?php echo $page_title; ?>',
-	height: 600,
-	trackOver: true,
-	selModel: 'rows',
-	columnLines: false,
-	columnClickData: true,
-	paging: {
-		pageSize: 50,
-		pageSizeData: [50,100,150,200]
-	},
-	tbar: [{
-		text: 'Khôi phục',
-		tip: 'Chọn 1 hoặc nhiều hàng để khôi phục',
-		handler: function() {
-			var me = this,
-			selection = me.getSelection();
+    renderTo: 'grid_<?php echo $page_id; ?>',
+    theme: 'blue',
+    height: 580,
+    trackOver: true,
+    selModel: 'rows',
+    paging: {
+        pageSize: 50,
+        pageSizeData: [50,100,150,200]
+    },
+    controllers: ['controller_<?php echo $page_id; ?>'],
+	tbar: [
+		{
+            type: 'search',
+            width: 350,
+            emptyText: 'Tìm kiếm thông tin bất kỳ',
+            tip: 'Nhập thông tin',
+            paramsMenu: true,
+            paramsText: 'Cài đặt',
+        },
+		{
+			text: 'Khôi phục',
+			tip: 'Chọn 1 hoặc nhiều hàng để khôi phục',
+			handler: function() {
+				var me = this,
+				selection = me.getSelection();
 
-			$.each(selection, function() {
-				me.restoreFromTrash(this);
-			})
-		}
-	}, {
-		text: 'Xóa hoàn toàn',
-		tip: 'Chọn 1 hoặc nhiều hàng để xóa hoàn toàn',
-		handler: function() {
-			var me = this,
-			selection = me.getSelection();
+				$.each(selection, function() {
+					me.restoreFromTrash(this);
+				})
+			}
+		},
+		{
+			text: 'Xóa hoàn toàn',
+			tip: 'Chọn 1 hoặc nhiều hàng để xóa hoàn toàn',
+			handler: function() {
+				var me = this,
+				selection = me.getSelection();
 
-			$.each(selection, function() {
-				me.permanentlyDelete(this);
-			})
+				$.each(selection, function() {
+					me.permanentlyDelete(this);
+				})
+			}
+		},
+		{
+			text: 'Xuất ra Excel',
+            tip: 'Tạm thời chỉ xuất được file .csv, upload mở trong Google Drive để đọc được chữ tiếng Việt',
+			handler: function() {
+				fancygrid_2_csv('#grid_<?php echo $page_id; ?>', '<?php echo $page_title; ?>.csv');
+			}
 		}
-	}, {
-		text: 'Xuất ra Excel',
-		handler: function() {
-			fancygrid_2_csv('#grid_<?php echo $page_id; ?>', '<?php echo $page_title; ?>.csv');
-		}
-	}],
+	],
 	events: [{
 		select: 'onSelect'
 	}, {
 		clearselect: 'onClearSelect'
 	}],
-	controllers: ['grid_controller'],
-	defaults: {
-		type: 'string',
-		sortable: true,
-		resizable: true,
-		editable: false,
-		vtype: 'notempty',
-		ellipsis: true,
-		filter: {
-			header: true,
-			emptyText: 'Tìm kiếm'
-		},
-		width: 130,
-		menu: true,
-	},
-	data: {
-		proxy: {
-			api: {
-				read: 	'?c=<?php echo $controller; ?>&a=getData&trash',
-			}
-		}
-	},
-<?php echo fancygrid_columns($fancygrid['columns']); ?>
+<?php echo FancygridParse($fancygrid); ?>
 });
 </script>

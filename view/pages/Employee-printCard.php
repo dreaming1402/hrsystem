@@ -1,8 +1,11 @@
 <div class="row">
 
+    <section id="alert-area" class="col-md-12">
+    </section><!--alert-area-->
+
     <section class="col-md-12">
         <div class="box box-default">
-            <div id="grid_<?php echo $page_id;?>"></div>
+            <div id="grid_<?php echo $page_id;  ?>"></div>
         </div><!--box-->
     </section><!--col-md-12-->
 
@@ -29,23 +32,30 @@ var employeeCard,
     pregnancy_unlimit_card_template = GetLinkContent('?c=MyCard&a=gettemplate&t=employee&pregnancy&unlimit'),
     hasbaby_unlimit_card_template = GetLinkContent('?c=MyCard&a=gettemplate&t=employee&hasbaby&unlimit');
 
-Fancy.defineController('conrol_<?php echo $page_id;?>', {
+Fancy.defineController('controller_<?php echo $page_id; ?>', {
     onSelect: function(grid) { // done
         var selection = grid.getSelection(),
-            print_button = grid.tbar[1];
+            viewDetail_button = grid.tbar[1],
+            print_button = grid.tbar[2];
 
         if (selection.length > 0) {
+            viewDetail_button.enable();
             print_button.enable();
         } else {
+            viewDetail_button.disable();
             print_button.disable();
         };
     },
     onClearSelect: function(grid) { // done
         grid.tbar[1].disable();
+        grid.tbar[2].disable();
     },
     onCellClick: function(grid, o) { // done
         if (o.column.title != 'Tải') return;
         grid.printCard(o.data);
+    },
+    onRowDBLClick: function(grid, o) {
+        grid.viewDetail(o.data);
     },
     printCard: function(item) { // done
         var me = this,
@@ -93,7 +103,7 @@ Fancy.defineController('conrol_<?php echo $page_id;?>', {
             // Tạo form in thẻ mới nếu được kick hoạt lần đầu
             printCardForm = new FancyForm({
                 title: {
-                    text: 'In thẻ nhân viên',
+                    text: '<?php echo $page_title; ?>',
                     tools: [
                         {
                             text: 'Đóng',
@@ -139,6 +149,7 @@ Fancy.defineController('conrol_<?php echo $page_id;?>', {
                     init: function() {
                         // Fill all fields
                         this.set(item);
+                        this.set('print_card_id', item.employee_id);
 
                         // Hiển thị form
                         this.show();
@@ -186,19 +197,83 @@ Fancy.defineController('conrol_<?php echo $page_id;?>', {
         else
             me.printCardForm.set('print_card_type', '');
     },
+    viewDetail: function(item) {
+        var me = this,
+            viewDetailGrid = me.viewDetailGrid;
+
+        // Nếu đã tồn tại gird
+        if (viewDetailGrid) {
+            viewDetailGrid.data.proxy.api.read = '?c=PrintCard&a=getData&employee_id='+item.employee_id;
+
+            viewDetailGrid.load();
+            viewDetailGrid.show();
+        } else {
+            // Nếu chưa thì tạo mới grid
+            viewDetailGrid = new FancyGrid({
+                theme: 'blue',
+                width: 580,
+                trackOver: true,
+                selModel: 'rows',
+                paging: {
+                    pageSize: 50,
+                    pageSizeData: [50,100,150,200]
+                },
+                events: [{
+                    init: function() {
+                        // Hiển thị form
+                        this.show();
+                    }
+                }],
+
+                window: true,
+                modal: true,
+                draggable: true,
+                height: 400,
+                title: {
+                    text: 'Chi tiết',
+                    tools: [
+                        {
+                            text: 'Đóng',
+                            handler: function() {
+                                this.hide();
+                            }
+                        }
+                    ]
+                },
+                buttons: ['side',
+                    {
+                        text: 'Đóng',
+                        handler: function() {
+                            this.hide();
+                        }
+                    },
+                ],
+                data: {
+                    proxy: {
+                        api: {
+                            read: '?c=PrintCard&a=getData&employee_id='+item.employee_id,
+                        },
+                    },
+                },
+                <?php echo FancygridParse($childgrid); ?>
+            });
+        }
+
+        me.viewDetailGrid = viewDetailGrid;
+    },
 });
-var gird_<?php echo $page_id;?> = new FancyGrid({
-    title: 'Danh sách in thẻ',
-	renderTo: 'grid_<?php echo $page_id;?>',
+var gird_<?php echo $page_id; ?> = new FancyGrid({
+    title: '<?php echo $page_title; ?>',
+	renderTo: 'grid_<?php echo $page_id; ?>',
 	theme: 'blue',
-	height: 600,
+	height: 580,
 	trackOver: true,
 	selModel: 'rows',
 	paging: {
         pageSize: 50,
         pageSizeData: [50,100,150,200]
 	},
-    controllers: ['conrol_<?php echo $page_id;?>'],    
+    controllers: ['controller_<?php echo $page_id; ?>'],    
     tbar: [
         {
             type: 'search',
@@ -209,26 +284,32 @@ var gird_<?php echo $page_id;?> = new FancyGrid({
             paramsText: 'Cài đặt'
         },
         {
-            text: 'Tải xuống thẻ được chọn',
-            tip: 'Bôi đen các hàng để in nhiều người',
+            text: 'Xem chi tiết',
+            tip: 'Click chuột 2 lần vào hàng muốn xem',
             disabled: true,
             handler: function(){
-                this.clearFilter();
-                console.log(this.get('employee_gender'));
+                this.viewDetail(this.getSelection()[0]);
+            }
+        },
+        {
+            text: 'Tải xuống thẻ được chọn',
+            tip: 'Bôi đen nhiều hàng để in nhiều người',
+            disabled: true,
+            handler: function(){
+                alert('Tính năng này chưa có sẵn');
             }
         },
         {
             text: 'Xóa bộ lọc',
             handler: function(){
                 this.clearFilter();
-                console.log(this.get('employee_gender'));
             }
         },
         {
             text: 'Xuất ra Excel',
             tip: 'Tạm thời chỉ xuất được file .csv, upload mở trong Google Drive để đọc được chữ tiếng Việt',
             handler: function() {
-                FancygridToCsv('#grid_<?php echo $page_id;?>', '<?php echo $page_title; ?>.csv');
+                FancygridToCsv('#grid_<?php echo $page_id; ?>', '<?php echo $page_title; ?>.csv');
             }
         }
     ],
@@ -236,14 +317,8 @@ var gird_<?php echo $page_id;?> = new FancyGrid({
         { select: 'onSelect' },
         { clearselect: 'onClearSelect' },
         { cellclick: 'onCellClick' },
+        { rowdblclick: 'onRowDBLClick' },
     ],
-	data: {
-		proxy: {
-			api: {
-				read: 	'?c=Employee&a=getPrintList',
-			}
-		}
-	},   
-<?php echo FancygridParse($fancygrid); ?>
+    <?php echo FancygridParse($fancygrid); ?>
 });
 </script>

@@ -1,224 +1,8 @@
 <?php
 class PrintCard_Controller extends Base_Controller
 {	
-    private $fancyform, $fancygrid, $sql_database, $controller_data;
-	public function __construct() {
-        parent::__construct();
-
-		$this->model->load('API');
-		$this->helper->load('Fancygrid');
-
-		if ($this->action == 'edit')
-			$controller_data = $this->getData()['response']['data'];
-		else
-			$controller_data = false;
-
-		if (sizeof($controller_data) <= 0 && $this->action == 'edit')
-			$this->error(404);
-
-		$controller_data = (isset($_GET['print_card_id']) || isset($_GET['id'])) ? $controller_data[0] : false;
-		$this->controller_data = $controller_data;
-
-        if (in_array($this->action, ['new', 'edit'])) {
-        	$department = parse_fancyform_enum($this->model->API->get_index('db_employee', 'department'));
-			$position = parse_fancyform_enum($this->model->API->get_index('db_employee', 'position'));
-			$employee_type = parse_fancyform_enum($this->model->API->get_index('db_employee', 'employee_type'));
-
-			$maternity_type = parse_fancyform_enum($this->model->API->get_index('db_maternity', 'maternity_type'));
-
-			$this->fancyform = [
-	        	[//lịch sử in ảnh
-					'type'	=> 'tab',
-					'label'	=> 'Lịch sử in ảnh',
-					'items'	=> [
-						[
-							'type'	=> 'line',
-							'items'	=> [
-								[
-									'type'	=> 'string',
-									'name'	=> 'print_card_id',
-									'label'	=> 'Mã số in thẻ',
-						        	'value'	=> $controller_data ? $controller_data['print_card_id'] : '',
-
-								], [
-									'type'	=> 'date',
-									'name'	=> 'print_date',
-									'label'	=> 'Ngày in',
-						        	'value'	=> $controller_data ? $controller_data['print_date'] : '',
-								], [
-									'type'	=> 'textarea',
-									'name'	=> 'print_description',
-									'label'	=> 'Diễn giải',
-						        	'value'	=> $controller_data ? $controller_data['print_description'] : '',
-								], [
-						        	'type'	=> 'hidden',
-						        	'name'	=> 'print_card_trash_flag',
-						        	'value'	=> $controller_data ? $controller_data['print_card_trash_flag'] : 0,
-				        		], 
-
-				        		[
-									'type'	=> 'combo',
-									'name'	=> 'employee_department',
-									'label'	=> 'Bộ phận',
-						        	'value'	=> $controller_data ? $controller_data['employee_department'] : '',
-						        	'data'	=> $department,
-								], [
-									'type'	=> 'string',
-									'name'	=> 'employee_id',
-									'label'	=> 'Mã số nhân viên',
-						        	'value'	=> $controller_data ? $controller_data['employee_id'] : '',
-								], [
-									'type'	=> 'string',
-									'name'	=> 'employee_full_name',
-									'label'	=> 'Họ và tên',
-						        	'value'	=> $controller_data ? $controller_data['employee_full_name'] : '',
-								], [
-									'type'	=> 'combo',
-									'name'	=> 'employee_position',
-									'label'	=> 'Vị trí làm việc',
-						        	'value'	=> $controller_data ? $controller_data['employee_position'] : '',
-						        	'data'	=> $position,
-								], [
-									'type'	=> 'combo',
-									'name'	=> 'employee_type',
-									'label'	=> 'Loại nhân viên',
-						        	'value'	=> $controller_data ? $controller_data['employee_type'] : '',
-						        	'data'	=> $employee_type,
-								], [
-									'type'	=> 'string',
-									'name'	=> 'employee_contract_id',
-									'label'	=> 'In theo hợp đồng số',
-						        	'value'	=> $controller_data ? $controller_data['employee_contract_id'] : '',
-								], [
-									'type'	=> 'combo',
-									'name'	=> 'maternity_type',
-									'label'	=> 'Thai sản',
-						        	'value'	=> $controller_data ? $controller_data['maternity_type'] : '',
-						        	'data'	=> $maternity_type,
-								],  [
-									'type'	=> 'date',
-									'name'	=> 'maternity_begin',
-									'label'	=> 'Ngày bắt đầu chế độ',
-						        	'value'	=> $controller_data ? $controller_data['maternity_begin'] : '',
-								], [
-									'type'	=> 'date',
-									'name'	=> 'maternity_end',
-									'label'	=> 'Ngày kết thúc chế độ',
-						        	'value'	=> $controller_data ? $controller_data['maternity_end'] : '',
-								],
-
-
-							]
-						]
-					]
-				]
-	        ];
-	    } else if (in_array($this->action, ['management', 'trash', 'history'])) {	    	
-			$department = parse_fancygrid_enum($this->model->API->get_index('db_employee', 'department'));
-			$position = parse_fancygrid_enum($this->model->API->get_index('db_employee', 'position'));
-			$employee_type = parse_fancygrid_enum($this->model->API->get_index('db_employee', 'employee_type'));
-
-			$maternity_type = parse_fancygrid_enum($this->model->API->get_index('db_maternity', 'maternity_type'));
-
-	    	$this->fancygrid = [
-	        	'columns' => [
-		        	[
-		        		'type'	=> 'select',
-		        		'width'	=> 35,
-		        		'locked'=> 1,
-		        	], [
-						'type'	=> 'string',
-		        		'index'	=> 'print_card_id',
-		        		'title'	=> 'Mã in thẻ',
-		        		'locked'=> 1,
-		        	], [
-						'type'	=> 'date',
-		        		'index'	=> 'print_date',
-		        		'title'	=> 'Ngày in thẻ',
-		        		'editable'	=> 1,
-		        		'locked'=> 1,
-		        	], [
-						'type'	=> 'string',
-		        		'index'	=> 'print_description',
-		        		'title'	=> 'Diễn giải',
-		        		'editable'	=> 1,
-		        		'locked'=> 1,
-		        	], [
-						'type'	=> 'combo',
-		        		'index'	=> 'employee_department',
-		        		'title'	=> 'Bộ phận',
-		        		'data'	=> $department,
-		        		'editable'	=> 1,
-		        	], [
-						'type'	=> 'string',
-		        		'index'	=> 'employee_id',
-		        		'title'	=> 'Mã nhân viên',
-		        		'editable'	=> 1,
-		        	], [
-						'type'	=> 'string',
-		        		'index'	=> 'employee_full_name',
-		        		'title'	=> 'Họ và tên',
-		        		'editable'	=> 1,
-		        	], [
-						'type'	=> 'combo',
-		        		'index'	=> 'employee_position',
-		        		'title'	=> 'Vị trí làm việc',
-		        		'data'	=> $position,
-		        		'editable'	=> 1,
-		        	], [
-						'type'	=> 'combo',
-		        		'index'	=> 'employee_type',
-		        		'title'	=> 'Loại nhân viên',
-		        		'editable'	=> 1,
-		        		'data'	=> $employee_type,
-		        	], [
-						'type'	=> 'string',
-		        		'index'	=> 'employee_contract_id',
-		        		'title'	=> 'Mã hợp đồng',
-		        		'editable'	=> 1,
-		        	], [
-						'type'	=> 'combo',
-		        		'index'	=> 'maternity_type',
-		        		'title'	=> 'Thai sản',
-		        		'data'	=> $maternity_type,
-		        		'editable'	=> 1,
-		        	], [
-						'type'	=> 'date',
-		        		'index'	=> 'maternity_begin',
-		        		'title'	=> 'Ngày bắt đầu chế độ',
-		        		'editable'	=> 1,
-		        	], [
-						'type'	=> 'date',
-		        		'index'	=> 'maternity_end',
-		        		'title'	=> 'Ngày kết thúc',
-		        		'editable'	=> 1,
-		        	]
-	        	],
-	        ];
-	    }
-        $this->sql_database = [
-        	'db_print_card' => [
-	            'print_card_id'   => 'Print No',
-	            'print_date'  => 'Print Date',
-	            'print_description'  => 'Print Description',
-	            'print_card_trash_flag'   => '',
-
-	            'employee_department'	=> 'Department',
-	            'employee_id'	=> 'Emp ID',
-	            'employee_full_name'	=> 'Full Name',
-	            'employee_position'		=> 'Position',
-	            'employee_type'			=> 'Employee Type',
-	            'emplpyee_contract_id'	=> 'Contract No',
-
-	            'maternity_type'	=> 'Maternity',
-	            'maternity_begin'	=> 'Start Date',
-	            'maternity_end'		=> 'End Date',
-	        ],
-        ];
-    }
-
-	public function moveToTrashAction() { //done
-        $query_flag = false;
+	public function moveToTrashAction() { // done
+        // Define
 		$data = [
         	'response'  => [
                 'success'   => false,
@@ -235,23 +19,32 @@ class PrintCard_Controller extends Base_Controller
                 $data['response']['message'] = 'Id không đúng';
         	} else {
         		$this->model->load('API');
-        		$query_flag = $this->model->API->edit_row('db_print_card', ['print_card_trash_flag' => true], 'id="'.$id.'"');
+
+        		$sql['data'] = [
+        			'print_card_trash_flag'	=> true,
+        		];
+
+        		$sql['where']	= [
+        			'id'	=> $id,
+        		];
+
+        		$query_flag = $this->model->API->edit_row('db_print_card', $sql['data'], $sql['where']);
+
+				if ($query_flag) {
+					$data['response']['success'] = true;
+		            $data['response']['message'] = 'Đã chuyển vào thùng rác';
+		            $data['response']['data']['id'] = $id;
+				}
+				
+		        $this->view->load('json', $data);
         	}
         } else {
         	$this->error(405);
         }
-
-		if ($query_flag) {
-			$data['response']['success'] = true;
-            $data['response']['message'] = 'Đã chuyển vào thùng rác';
-            $data['response']['data']['id'] = $id;
-		}
-		
-        $this->view->load('json', $data);
     }
 
-    public function restoreFromTrashAction() { //done
-        $query_flag = false;
+    public function restoreFromTrashAction() { // done
+        // Define
 		$data = [
         	'response'  => [
                 'success'   => false,
@@ -268,23 +61,32 @@ class PrintCard_Controller extends Base_Controller
                 $data['response']['message'] = 'Id không đúng';
         	} else {
         		$this->model->load('API');
-        		$query_flag = $this->model->API->edit_row('db_print_card', ['print_card_trash_flag' => false], 'id="'.$id.'"');
+
+        		$sql['data'] = [
+        			'print_card_trash_flag'	=> false,
+        		];
+
+        		$sql['where']	= [
+        			'id'	=> $id,
+        		];
+
+        		$query_flag = $this->model->API->edit_row('db_print_card', $sql['data'], $sql['where']);
+
+				if ($query_flag) {
+					$data['response']['success'] = true;
+		            $data['response']['message'] = 'Đã chuyển vào thùng rác';
+		            $data['response']['data']['id'] = $id;
+				}
+				
+		        $this->view->load('json', $data);
         	}
         } else {
         	$this->error(405);
         }
-
-		if ($query_flag) {
-			$data['response']['success'] = true;
-            $data['response']['message'] = 'Đã khôi phục thành công';
-            $data['response']['data']['id'] = $id;
-		}
-		
-        $this->view->load('json', $data);
     }
 
-    public function permanentlyDeleteAction() { //done
-    	$query_flag = false;
+    public function permanentlyDeleteAction() { // done
+		// Define
 		$data = [
         	'response'  => [
                 'success'   => false,
@@ -301,54 +103,366 @@ class PrintCard_Controller extends Base_Controller
                 $data['response']['message'] = 'Id không đúng';
         	} else {
         		$this->model->load('API');
-        		$query_flag = $this->model->API->delete_row('db_print_card', 'id="'.$id.'"');
+
+        		$sql['where']	= [
+        			'id'	=> $id,
+        		];
+
+        		$query_flag = $this->model->API->delete_row('db_print_card', $sql['where']);
+
+				if ($query_flag) {
+					$data['response']['success'] = true;
+		            $data['response']['message'] = 'Đã xóa thành công';
+		            $data['response']['data']['id'] = $id;
+				}
+				
+		        $this->view->load('json', $data);
         	}
         } else {
         	$this->error(405);
         }
-
-		if ($query_flag) {
-			$data['response']['success'] = true;
-            $data['response']['message'] = 'Đã xóa thành công';
-            $data['response']['data']['id'] = $id;
-		}
-		
-        $this->view->load('json', $data);
     }
 
-	public function historyAction() { //done
-    	if ($this->method == 'POST') { //save history
-			$this->model->API->new_row('db_print_card', $_POST);
-		} else {
-			$data = [
-		        'page_title'=> 'Lịch sử in thẻ',
-		        'page_id'   => $this->page_id,
+	public function historyAction() { // done
+		$this->helper->load('Fancygrid');
 
-		        'page'	=> 'pages/PrintCard-history.php',
-		        'controller'	=> $this->controller,
-
-		        'fancygrid'	=> $this->fancygrid,
-		    ];
-
-			$this->view->load('main', $data);
-		}
-    }
-
-	public function trashAction() { //done
     	$data = [
-	        'page_title'=> 'Lịch sử in thẻ đã xóa',
+	        'page_title'=> 'Lịch sử in thẻ',
 	        'page_id'   => $this->page_id,
+	        'page'		=> 'pages/Controller-history.php',
 
-	        'page'	=> 'pages/Controller-trash.php',
-	        'controller'	=> $this->controller,
+	        'controller'=> 'PrintCard',
 
-	        'fancygrid'	=> $this->fancygrid,
+			'fancygrid'	=> [
+	        	'defaults'	=> [
+					'type'		=> 'string',
+	        		'filter'	=> [
+	        			'header'	=> true,
+	        			'emptyText'	=> 'Tìm kiếm',
+	        		],
+					//'filter' 	=> true,
+					'menu'		=> true,
+	        		'sortable'	=> true,
+    				'resizable'	=> true,
+    				'editable'	=> false,
+    				'vtype'		=> 'notempty',
+					'ellipsis'	=> true,
+					'width'		=> 120,
+	        	],
+	        	'data'	=> [
+	        		'proxy'	=> [
+	        			'api'	=> [
+	        				'read'	=> '?c=PrintCard&a=getData',
+	        				'update'=> '?c=API&a=edit&t=db_print_card',
+	        			]
+	        		],
+	        	],
+	        	'columns'	=> [
+	        		[ // select
+						'type'	=> 'select',
+						'rightLocked' => true,
+						'width'	=> 50,
+		        	],
+	        		[ // print_date
+						'type'	=> 'date',
+		        		'index'	=> 'print_date',
+		        		'title'	=> 'Ngày in',
+						'width'	=> 90,
+						'locked' => true,
+		        	],
+	        		[ // print_by
+						'type'	=> 'combo',
+		        		'index'	=> 'print_by',
+		        		'title'	=> 'Người in',
+						'width'	=> 90,
+						'locked' => true,
+						'displayKey' => 'print_by',
+						'data'	=> [
+							'proxy'	=> [
+								'url'	=> '?c=PrintCard&a=getData&i=print_by',
+							],
+						],
+		        	],
+	        		[ // print_card_type
+						'type'	=> 'combo',
+		        		'index'	=> 'print_card_type',
+		        		'title'	=> 'Loại thẻ',
+						'width'	=> 70,
+						'locked' => true,
+						'displayKey' => 'print_card_type',
+						'data'	=> [
+							'proxy'	=> [
+								'url'	=> '?c=PrintCard&a=getData&i=print_card_type',
+							],
+						],
+		        	],
+	        		[ // print_description
+						'type'	=> 'string',
+		        		'index'	=> 'print_description',
+		        		'title'	=> 'Diễn giải',
+						'width'	=> 90,
+						'locked' => true,
+		        	],
+    				[ // employee_department
+						'type'	=> 'combo',
+		        		'index'	=> 'employee_department',
+						'title'	=> 'Bộ phận',
+		        		'width'	=> 100,
+		        		'locked'=> true,
+						'displayKey' => 'employee_department',
+						'data'	=> [
+							'proxy'	=> [
+								'url'	=> '?c=PrintCard&a=getData&i=employee_department',
+							],
+						],
+		        	],
+	        		[ // employee_id
+						'type'	=> 'number',
+		        		'index'	=> 'employee_id',
+						'title'	=> 'Mã NV',
+						'width'	=> 70,
+		        		'locked'=> true,
+		        	],
+	        		[ // employee_name
+						'type'	=> 'string',
+		        		'index'	=> 'employee_name',
+		        		'title'	=> 'Họ và tên',
+		        		'locked'=> true,
+						'width'	=> 160,
+		        	],
+	        		[ // employee_position
+						'type'	=> 'combo',
+						'index'	=> 'employee_position',
+						'title'	=> 'Vị trí làm việc',
+						'displayKey' => 'employee_position',
+						'data'	=> [
+							'proxy'	=> [
+								'url'	=> '?c=PrintCard&a=getData&i=employee_position',
+							],
+						],
+					],
+	        		[ // employee_type
+						'type'	=> 'combo',
+						'index'	=> 'employee_type',
+						'title'	=> 'Loại nhân viên',
+						'displayKey' => 'employee_type',
+						'data'	=> [
+							'proxy'	=> [
+								'url'	=> '?c=PrintCard&a=getData&i=employee_type',
+							],
+						],
+					],
+	        		[ // contract_type
+						'type'	=> 'combo',
+						'index'	=> 'contract_type',
+						'title'	=> 'Loại hợp đồng',
+						'displayKey' => 'contract_type',
+						'data'	=> [
+							'proxy'	=> [
+								'url'	=> '?c=PrintCard&a=getData&i=contract_type',
+							],
+						],
+					],
+	        		[ // maternity_type
+						'type'	=> 'combo',
+						'index'	=> 'maternity_type',
+						'title'	=> 'Loại thai sản',
+						'displayKey' => 'maternity_type',
+						'data'	=> [
+							'proxy'	=> [
+								'url'	=> '?c=PrintCard&a=getData&i=maternity_type',
+							],
+						],
+					],
+	        		[ // maternity_begin
+						'type'	=> 'date',
+		        		'index'	=> 'maternity_begin',
+						'title'	=> 'Ngày hưởng chế độ thai sản',
+						'width'	=> 100,
+		        	],
+	        		[ // maternity_end
+						'type'	=> 'date',
+		        		'index'	=> 'maternity_end',
+						'title'	=> 'Ngày kết thúc độ thai sản',
+						'width'	=> 100,
+		        	],
+	        	],
+	        ],
 	    ];
 
 		$this->view->load('main', $data);
     }
 
-    public function importDataAction() { //done
+	public function trashAction() { // done		
+		$this->helper->load('Fancygrid');
+
+    	$data = [
+	        'page_title'=> 'Lịch sử in thẻ đã xóa',
+	        'page_id'   => $this->page_id,
+
+	        'page'	=> 'pages/Controller-trash.php',
+	        'controller'	=> 'PrintCard',
+
+	        'fancygrid'	=> [
+	        	'defaults'	=> [
+					'type'		=> 'string',
+	        		'filter'	=> [
+	        			'header'	=> true,
+	        			'emptyText'	=> 'Tìm kiếm',
+	        		],
+					//'filter' 	=> true,
+					'menu'		=> true,
+	        		'sortable'	=> true,
+    				'resizable'	=> true,
+    				'editable'	=> false,
+    				'vtype'		=> 'notempty',
+					'ellipsis'	=> true,
+					'width'		=> 120,
+	        	],
+	        	'data'	=> [
+	        		'proxy'	=> [
+	        			'api'	=> [
+	        				'read'	=> '?c=PrintCard&a=getData&trash',
+	        			]
+	        		],
+	        	],
+	        	'columns'	=> [
+	        		[ // select
+						'type'	=> 'select',
+						'rightLocked' => true,
+						'width'	=> 50,
+		        	],
+	        		[ // print_date
+						'type'	=> 'date',
+		        		'index'	=> 'print_date',
+		        		'title'	=> 'Ngày in',
+						'width'	=> 90,
+						'locked' => true,
+		        	],
+	        		[ // print_by
+						'type'	=> 'combo',
+		        		'index'	=> 'print_by',
+		        		'title'	=> 'Người in',
+						'width'	=> 90,
+						'locked' => true,
+						'displayKey' => 'print_by',
+						'data'	=> [
+							'proxy'	=> [
+								'url'	=> '?c=PrintCard&a=getData&i=print_by',
+							],
+						],
+		        	],
+	        		[ // print_card_type
+						'type'	=> 'combo',
+		        		'index'	=> 'print_card_type',
+		        		'title'	=> 'Loại thẻ',
+						'width'	=> 70,
+						'locked' => true,
+						'displayKey' => 'print_card_type',
+						'data'	=> [
+							'proxy'	=> [
+								'url'	=> '?c=PrintCard&a=getData&i=print_card_type',
+							],
+						],
+		        	],
+	        		[ // print_description
+						'type'	=> 'string',
+		        		'index'	=> 'print_description',
+		        		'title'	=> 'Diễn giải',
+						'width'	=> 90,
+						'locked' => true,
+		        	],
+    				[ // employee_department
+						'type'	=> 'combo',
+		        		'index'	=> 'employee_department',
+						'title'	=> 'Bộ phận',
+		        		'width'	=> 100,
+		        		'locked'=> true,
+						'displayKey' => 'employee_department',
+						'data'	=> [
+							'proxy'	=> [
+								'url'	=> '?c=PrintCard&a=getData&i=employee_department',
+							],
+						],
+		        	],
+	        		[ // employee_id
+						'type'	=> 'number',
+		        		'index'	=> 'employee_id',
+						'title'	=> 'Mã NV',
+						'width'	=> 70,
+		        		'locked'=> true,
+		        	],
+	        		[ // employee_name
+						'type'	=> 'string',
+		        		'index'	=> 'employee_name',
+		        		'title'	=> 'Họ và tên',
+		        		'locked'=> true,
+						'width'	=> 160,
+		        	],
+	        		[ // employee_position
+						'type'	=> 'combo',
+						'index'	=> 'employee_position',
+						'title'	=> 'Vị trí làm việc',
+						'displayKey' => 'employee_position',
+						'data'	=> [
+							'proxy'	=> [
+								'url'	=> '?c=PrintCard&a=getData&i=employee_position',
+							],
+						],
+					],
+	        		[ // employee_type
+						'type'	=> 'combo',
+						'index'	=> 'employee_type',
+						'title'	=> 'Loại nhân viên',
+						'displayKey' => 'employee_type',
+						'data'	=> [
+							'proxy'	=> [
+								'url'	=> '?c=PrintCard&a=getData&i=employee_type',
+							],
+						],
+					],
+	        		[ // contract_type
+						'type'	=> 'combo',
+						'index'	=> 'contract_type',
+						'title'	=> 'Loại hợp đồng',
+						'displayKey' => 'contract_type',
+						'data'	=> [
+							'proxy'	=> [
+								'url'	=> '?c=PrintCard&a=getData&i=contract_type',
+							],
+						],
+					],
+	        		[ // maternity_type
+						'type'	=> 'combo',
+						'index'	=> 'maternity_type',
+						'title'	=> 'Loại thai sản',
+						'displayKey' => 'maternity_type',
+						'data'	=> [
+							'proxy'	=> [
+								'url'	=> '?c=PrintCard&a=getData&i=maternity_type',
+							],
+						],
+					],
+	        		[ // maternity_begin
+						'type'	=> 'date',
+		        		'index'	=> 'maternity_begin',
+						'title'	=> 'Ngày hưởng chế độ thai sản',
+						'width'	=> 100,
+		        	],
+	        		[ // maternity_end
+						'type'	=> 'date',
+		        		'index'	=> 'maternity_end',
+						'title'	=> 'Ngày kết thúc độ thai sản',
+						'width'	=> 100,
+		        	],
+	        	],
+	        ],
+	    ];
+
+		$this->view->load('main', $data);
+    }
+/*
+    public function importDataAction() { // done
     	$data = [
 			'page_title'	=> 'Tải lên danh sách đã in thẻ',
 			'page_id'		=> $this->page_id,
@@ -356,39 +470,72 @@ class PrintCard_Controller extends Base_Controller
 
 		$this->view->load('main', $data);
     }
+*/
 
-    public function getDataAction() { //done
-		$this->view->load('json', $this->getData());
+    public function getDataAction() { // done
+    	// Define
+		$data = $this->getData($_GET, isset($_GET['trash']) == true);
+
+		// lấy index theo field i
+		$index_data = [];
+		if (isset($_GET['i'])) {
+			array_push($index_data, [$_GET['i'] => '']);
+			foreach ($data['response']['data'] as $key => $value) {
+				if (isset($value[$_GET['i']])) {
+					$index_value = [$_GET['i'] => $value[$_GET['i']]];
+					if (!in_array($index_value, $index_data))
+						array_push($index_data, $index_value);
+				}
+			}
+
+			$data = [
+				'response' => [
+					'success' => true,
+					'data'	=> $index_data,
+				]
+			];
+		};
+
+		$this->view->load('json', $data);
 	}
 
-	public function getData() { //done
+	private function getData($_where, $_trash = false) { // done
 		$this->model->load('API');
 
-		$params = [
-			'type'	=> 'select',
-			'fields'=> [],
-			'from'	=> 'prefix_db_print_card',
-			'where'	=> [
-				'relations'	=> 'AND',
-				'operator' => '=',
-				[
-					'print_card_trash_flag'	=> isset($_GET['trash']),
-				]
+		// Define
+		$data = [
+			'response' => [
+				'success'	=> false,
+				'data'		=> [],
 			],
 		];
 
-		if (isset($_GET['print_card_id'])) {
-			$params['where'][0]['print_card_id'] = $_GET['print_card_id'];
-		} else if (isset($_GET['id'])) {			
-			$params['where'][0]['id'] = $_GET['id'];
+		// Lấy danh sách in thẻ
+		$sql_print_card = [
+			'select'	=> [],
+			'from'	=> DB_PREFIX.'db_print_card',
+			'where'	=> [
+				[
+					'print_card_trash_flag' => $_trash,
+				]
+			]
+		];
+
+		if (isset($_where['employee_id'])) {
+			$sql_print_card['where'][0]['employee_id'] = $_where['employee_id'];
+		} else if (isset($_where['id'])) {
+			$sql_print_card['where'][0]['id'] = $_where['id'];
 		};
+
+		$print_card_data = $this->model->API->get_table($sql_print_card);
 
 		$data = [
 			'response' => [
 				'success'	=> true,
-				'data'		=> $this->model->API->get_table($params),
+				'data'		=> $print_card_data,
 			],
 		];
+
 		return $data;
 	}
 }

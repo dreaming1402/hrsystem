@@ -12,10 +12,10 @@
 </div><!--row-->
 
 <script>
-Fancy.defineController('grid_controller', {
+Fancy.defineController('controller_<?php echo $page_id; ?>', {
     onSelect: function(grid) {
         var selection = grid.getSelection(),
-        moveToTrashButton = grid.tbar[0];
+        moveToTrashButton = grid.tbar[1];
 
         if (selection.length >= 1) {
             moveToTrashButton.enable();
@@ -24,7 +24,7 @@ Fancy.defineController('grid_controller', {
         }
     },
     onClearSelect: function(grid) {
-        grid.tbar[0].disable();
+        grid.tbar[1].disable();
     },
     moveToTrash: function(item) {
         $.ajax({
@@ -41,57 +41,52 @@ Fancy.defineController('grid_controller', {
         });
     }
 });
-
 var grid_<?php echo $page_id; ?> = new FancyGrid({
-    renderTo: 'grid_<?php echo $page_id; ?>',
     title: '<?php echo $page_title; ?>',
-    height: 600,
+    renderTo: 'grid_<?php echo $page_id; ?>',
+    theme: 'blue',
+    height: 580,
     trackOver: true,
     selModel: 'rows',
-    dbClickToEdit: 1,
-    columnLines: false,
-    columnClickData: true,
     paging: {
         pageSize: 50,
         pageSizeData: [50,100,150,200]
     },
-    tbar: [{
-        text: 'Chuyển đến thùng rác',
-        tip: 'Chọn 1 hoặc nhiều hàng để chuyển đến thùng rác',
-        handler: function() {
-            var me = this,
-            selection = me.getSelection();
+    controllers: ['controller_<?php echo $page_id; ?>'],
+    tbar: [
+        {
+            type: 'search',
+            width: 350,
+            emptyText: 'Tìm kiếm thông tin bất kỳ',
+            tip: 'Nhập thông tin',
+            paramsMenu: true,
+            paramsText: 'Cài đặt',
+        },
+        {
+            text: 'Chuyển đến thùng rác',
+            tip: 'Chọn 1 hoặc nhiều hàng để chuyển đến thùng rác',
+            handler: function() {
+                var me = this,
+                selection = me.getSelection();
 
-            $.each(selection, function() {
-                me.moveToTrash(this);
-            })
+                $.each(selection, function() {
+                    me.moveToTrash(this);
+                });
+            }
+        },
+        {
+            text: 'Xuất ra Excel',
+            tip: 'Tạm thời chỉ xuất được file .csv, upload mở trong Google Drive để đọc được chữ tiếng Việt',
+            handler: function() {
+                FancygridToCsv('#grid_<?php echo $page_id; ?>', '<?php echo $page_title; ?>.csv');
+            },
         }
-    }, {
-        text: 'Xuất ra Excel',
-        handler: function() {
-            fancygrid_2_csv('#grid_<?php echo $page_id; ?>', '<?php echo $page_title; ?>.csv');
-        }
-    }],
+    ],
     events: [{
         select: 'onSelect'
     }, {
         clearselect: 'onClearSelect'
     },],
-    controllers: ['grid_controller'],
-    defaults: {
-        type: 'string',
-        sortable: true,
-        resizable: true,
-        editable: false,
-        vtype: 'notempty',
-        ellipsis: true,
-        filter: {
-            header: true,
-            emptyText: 'Tìm kiếm'
-        },
-        width: 130,
-        menu: true,
-    },
     data: {
         proxy: {
             api: {
@@ -100,6 +95,6 @@ var grid_<?php echo $page_id; ?> = new FancyGrid({
             }
         }
     },
-<?php echo fancygrid_columns($fancygrid['columns']); ?>
+<?php echo FancygridParse($fancygrid); ?>
 });
 </script>
