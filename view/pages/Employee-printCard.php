@@ -78,7 +78,7 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
             template_name.push('staff');
 
         // thẻ bầu và thẻ có con nhỏ không phân biệt employee_type
-        if (maternity_type != 'none')
+        if (maternity_type != 'none' && maternity_type != '')
             template_name = [maternity_type.ReplaceAll(' ', '')];
 
         // Kiểm tra quyền truy cập của nhân viên bằng tên bộ phận có trong unlimit[]

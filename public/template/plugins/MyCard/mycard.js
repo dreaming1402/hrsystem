@@ -40,6 +40,8 @@ function MyCard(_options) {
                 'employee_department',
                 'employeeImage',
                 'print_count',
+                'maternity_begin',
+                'maternity_end',
             ],
             hint: _options.hint || false,
 

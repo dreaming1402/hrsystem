@@ -123,6 +123,11 @@ class Employee_Controller extends Base_Controller
 						'type'	=> 'date',
 		        		'index'	=> 'print_date',
 						'title'	=> 'Ngày in',
+						'format'=> [
+							'read' => 'Y-m-d',
+							'write'=> 'd-m-Y',
+							'edit' => 'Y-m-d',
+						]
 		        	],
 		        	[
 						'type'	=> 'string',
@@ -372,7 +377,12 @@ class Employee_Controller extends Base_Controller
 		        		'index'	=> 'print_date',
 		        		'title'	=> 'Lần in cuối',
 						'width'	=> 90,
-						'rightLocked' => true,
+						'rightLocked' => true,						
+						'format' => [
+							'read' => 'Y-m-d',
+							'write'=> 'd-m-Y',
+							'edit' => 'Y-m-d',
+						]
 		        	],
 		        	[ // print_by
 						'type'	=> 'combo',
@@ -464,7 +474,7 @@ class Employee_Controller extends Base_Controller
 	private function getData($_where, $_trash = false) { // done
 		$this->model->load('API');
 
-		$data_file = 'http://localhost:81/data3.json';
+		$data_file = 'http://localhost:81/data.json';
 		// báo lỗi không tìm thấy dữ liệu
 		if (!UrlExist($data_file))
 			die('Không tìm thấy CSDL');
