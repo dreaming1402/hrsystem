@@ -97,8 +97,8 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
             employeeCard.AddCard(item, template_name);
 
             // Cập nhập form
-            printCardForm.set('print_card_id', item.employee_id);
             printCardForm.set(item);
+            printCardForm.set('print_card_id', item.employee_id);
 
             // Hiển thị form
             printCardForm.show();
@@ -143,6 +143,7 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
                             };
 
                             employeeCard.DownloadCardAll();
+
                             this.submit();
                             this.hide();
                         }

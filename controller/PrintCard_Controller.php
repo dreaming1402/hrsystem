@@ -520,6 +520,12 @@ class PrintCard_Controller extends Base_Controller
 		$sql_print_card = [
 			'select'	=> [],
 			'from'	=> DB_PREFIX.'db_print_card',
+			'orderby'	=> [
+				[
+					'print_date',
+				],
+				'order'	=> 'DESC',
+			],
 			'where'	=> [
 				[
 					'print_card_trash_flag' => $_trash,

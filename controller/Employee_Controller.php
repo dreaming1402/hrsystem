@@ -123,11 +123,6 @@ class Employee_Controller extends Base_Controller
 						'type'	=> 'date',
 		        		'index'	=> 'print_date',
 						'title'	=> 'Ngày in',
-						'format'=> [
-							'read' => 'Y-m-d',
-							'write'=> 'd-m-Y',
-							'edit' => 'Y-m-d',
-						]
 		        	],
 		        	[
 						'type'	=> 'string',
@@ -254,19 +249,34 @@ class Employee_Controller extends Base_Controller
 						'type'	=> 'date',
 		        		'index'	=> 'employee_birth_date',
 						'title'	=> 'Ngày sinh',
-						'width'	=> 100,
+						'width'	=> 100,	
+						'format'=> [
+							'read' => 'd/m/Y',
+							'write'=> 'd/m/Y',
+							'edit' => 'd/m/Y',
+						],
 		        	],
 		        	[ // employee_join_date
 						'type'	=> 'date',
 		        		'index'	=> 'employee_join_date',
 						'title'	=> 'Ngày vào làm',
 						'width'	=> 100,
+						'format'=> [
+							'read' => 'd/m/Y',
+							'write'=> 'd/m/Y',
+							'edit' => 'd/m/Y',
+						],
 		        	],
 		        	[ // employee_left_date
 						'type'	=> 'date',
 		        		'index'	=> 'employee_left_date',
 						'title'	=> 'Ngày nghỉ việc',
 						'width'	=> 100,
+						'format'=> [
+							'read' => 'd/m/Y',
+							'write'=> 'd/m/Y',
+							'edit' => 'd/m/Y',
+						],
 		        	],
 	        		[ // employee_status
 						'type'	=> 'combo',
@@ -321,13 +331,21 @@ class Employee_Controller extends Base_Controller
 						'type'	=> 'date',
 						'index'	=> 'contract_begin',
 						'title'	=> 'Ngày bắt đầu HĐLĐ',
-						//'data'	=> $employee_type,
+						'format'=> [
+							'read' => 'd/m/Y',
+							'write'=> 'd/m/Y',
+							'edit' => 'd/m/Y',
+						],
 					],
 					[ // contract_end
 						'type'	=> 'date',
 						'index'	=> 'contract_end',
 						'title'	=> 'Ngày kết thúc HĐLĐ',
-						//'data'	=> $employee_type,
+						'format'=> [
+							'read' => 'd/m/Y',
+							'write'=> 'd/m/Y',
+							'edit' => 'd/m/Y',
+						],
 					],
 					[ // maternity_type
 						'type'	=> 'combo',
@@ -345,12 +363,22 @@ class Employee_Controller extends Base_Controller
 		        		'index'	=> 'maternity_begin',
 						'title'	=> 'Ngày hưởng chế độ thai sản',
 						'width'	=> 100,
+						'format'=> [
+							'read' => 'd/m/Y',
+							'write'=> 'd/m/Y',
+							'edit' => 'd/m/Y',
+						],
 		        	],
 		        	[ // maternity_end
 						'type'	=> 'date',
 		        		'index'	=> 'maternity_end',
 						'title'	=> 'Ngày kết thúc độ thai sản',
 						'width'	=> 100,
+						'format'=> [
+							'read' => 'd/m/Y',
+							'write'=> 'd/m/Y',
+							'edit' => 'd/m/Y',
+						],
 		        	],
 		        	[ // employee_has_image
 						'type'	=> 'combo',
@@ -377,12 +405,7 @@ class Employee_Controller extends Base_Controller
 		        		'index'	=> 'print_date',
 		        		'title'	=> 'Lần in cuối',
 						'width'	=> 90,
-						'rightLocked' => true,						
-						'format' => [
-							'read' => 'Y-m-d',
-							'write'=> 'd-m-Y',
-							'edit' => 'Y-m-d',
-						]
+						'rightLocked' => true,
 		        	],
 		        	[ // print_by
 						'type'	=> 'combo',
@@ -492,8 +515,12 @@ class Employee_Controller extends Base_Controller
 			'select'	=> [],
 			'count'	=> 'print_count',
 			'from'	=> DB_PREFIX.'db_print_card',
-			'groupby'	=> 'print_card_id',
-			'order'	=> 'DESC',
+			'groupby'	=> [
+				[
+					'print_card_id',
+				],
+				'order'	=> 'DESC',
+			],
 			'where'	=> [
 				[
 					'print_card_trash_flag' => $_trash,
@@ -545,9 +572,14 @@ class Employee_Controller extends Base_Controller
 					foreach ($print_meta as $meta_key) {
 						if (isset($print_data[$employee_id][$meta_key]))
 							$new_data['data'][$index][$meta_key] = $print_data[$employee_id][$meta_key];
+						else $new_data['data'][$index][$meta_key] = "";
 					}
 				} else {
 					$new_data['data'][$index]['print_count'] = 0;
+					$new_data['data'][$index]['print_date'] = "";
+					$new_data['data'][$index]['print_by'] = "";
+					$new_data['data'][$index]['print_description'] = "";
+					$new_data['data'][$index]['print_card_type'] = "";
 				}
 
 				// Đánh dấu đã in
