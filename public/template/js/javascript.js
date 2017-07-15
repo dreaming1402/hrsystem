@@ -343,21 +343,8 @@ function FancygridToCsv(_gridId, _fileName) {
   };
 }
 
-// Hàm gọi event bằng function name
-function execute_function_by_name(functionName, context, args = []) {
-    var args = args.slice.call(arguments).splice(2),
-        namespaces = functionName.split("."),
-        func = namespaces.pop();
-
-    for(var i = 0; i < namespaces.length; i++) {
-        context = context[namespaces[i]];
-    }
-
-    return context[func].apply(context, args);
-}
-
 // Fix fancygird datetime filter by fancyform field
-Fancy.Grid.prototype.addFilter1 = function(index, value, sign){
+/*Fancy.Grid.prototype.addFilter = function(index, value, sign){
   var me = this,
     filter = me.filter.filters[index],
     sign = sign || '';
@@ -369,9 +356,9 @@ Fancy.Grid.prototype.addFilter1 = function(index, value, sign){
   if(Fancy.isDate(value)){
     filter['type'] = 'date';
     filter['format'] = this.lang.date;
-    /*filter['format']['read'] = "Y-m-d";
+    filter['format']['read'] = "Y-m-d";
     filter['format']['write'] = "d-m-Y";
-    filter['format']['edit'] = "Y-m-d";*/
+    filter['format']['edit'] = "Y-m-d";
     value = Number(value);
   }
 
@@ -384,9 +371,9 @@ Fancy.Grid.prototype.addFilter1 = function(index, value, sign){
 
   me.filter.filters[index] = filter;
   me.filter.updateStoreFilters();
-};
+};*/
 // Fix data list for combo col
-Fancy.form.field.Combo.prototype.loadListData1 = function() {
+/*Fancy.form.field.Combo.prototype.loadListData = function() {
   var a = this;
   if (Fancy.isObject(a.data)) {
     var b = a.data.proxy;
@@ -404,25 +391,40 @@ Fancy.form.field.Combo.prototype.loadListData1 = function() {
       }
     })
   }
+};*/
+
+// Hàm gọi event bằng function name
+function CallFunctionByName(_function_name, _context, _args = []) {
+  var args = _args.slice.call(arguments).splice(2),
+      namespaces = _function_name.split("."),
+      function_name = namespaces.pop(), // function name là cái cuối cùng của chuỗi
+      namespace = namespaces.pop(); // namespace của function là cái cuối cùng của chuỗi đã cắt bằng function_name
+
+  if (typeof _context[namespace][function_name] === 'function')
+    return _context[namespace][function_name].apply(_context[namespace][function_name], args);
+  else {
+    console.log('"'+_function_name+'" function is not available');
+    return false;
+  }
 };
 
 $(document).ready(function() {
   // Gọi event bằng class .control-action
   // Ex: <a class="control-action" action="file.upload" data="url">Click me</a>
   $('body').on('click', '.control-action', function() {
-      var action = $(this).attr('action'),
-          data = $(this).attr('action-data'); //option1
+    var action = $(this).attr('action'),
+        data = $(this).attr('action-data'); //option1
           //data = [{sender: $(this), data: $(this).attr('action-data')}]; //option2
-
+          
     //option1
-      if (isNaN(data))
-        data = [];
-      else
-        data = data.split('|');
+    if (data == null)
+      data = [];
+    else
+      data = data.split('|');
 
-      if (!Array.isArray(data))
-        data = [data];
+    if (!Array.isArray(data))
+      data = [data];
 
-      execute_function_by_name(action, window, data);
+      CallFunctionByName(action, window, data);
   })
 })

@@ -5,18 +5,18 @@
 
     <section class="col-md-12">
         <div class="box box-default">
-            <div id="grid_<?php echo $page_id;  ?>"></div>
-        </div><!--box-->
-    </section><!--col-md-12-->
-
-    <section class="col-md-12">
-        <div class="box box-default">
             <div class="box-header">
                 <i class="fa fa-download"></i>
                 <h3 class="box-title">Tải về <a href="<?php echo UPLOAD_DIR.'/forms/FORM IN THE GIAY - ORI.docm'; ?>">Mẫu in thẻ giấy</a> và <a href="<?php echo TEMPLATE_DIR.'/fonts/roboto.zip'; ?>">Font chữ</a></h3>
             </div><!--box-header-->
         </div><!--box-->
     </section><!--col-md-4-->
+
+    <section class="col-md-12">
+        <div class="box box-default">
+            <div id="grid_<?php echo $page_id;  ?>"></div>
+        </div><!--box-->
+    </section><!--col-md-12-->
     
 </div><!--row-->
 <script>
@@ -51,8 +51,11 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
         grid.tbar[2].disable();
     },
     onCellClick: function(grid, o) { // done
-        if (o.column.title != 'Tải') return;
-        grid.printCard(o.data);
+        if (o.column.title == 'Tải') {
+            grid.printCard(o.data);
+        } else if (o.column.title == 'Xem') {
+            grid.viewDetail(o.data);
+        }
     },
     onRowDBLClick: function(grid, o) {
         grid.viewDetail(o.data);
@@ -156,7 +159,7 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
                     }
                 }],
 
-                <?php echo FancyformParse($fancyform); ?>
+                <?php echo $fancyform; ?>
             });
 
             me.printCardForm = printCardForm;
@@ -166,7 +169,7 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
 
             // Khởi tạo plugin MyCard
             employeeCard = new MyCard({
-                debug: false,
+                debug: true,
                 namespace: 'employeeCard',
                 cardTemplates: {
                     default: default_card_template,
@@ -255,7 +258,7 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
                         },
                     },
                 },
-                <?php echo FancygridParse($childgrid); ?>
+                <?php echo $childgrid; ?>
             });
         }
 
@@ -306,6 +309,13 @@ var gird_<?php echo $page_id; ?> = new FancyGrid({
             }
         },
         {
+            text: 'Tải lại bảng',
+            tip: 'Refresh',
+            handler: function(){
+                this.load();
+            }
+        },
+        {
             text: 'Xuất ra Excel',
             tip: 'Tạm thời chỉ xuất được file .csv, upload mở trong Google Drive để đọc được chữ tiếng Việt',
             handler: function() {
@@ -319,6 +329,6 @@ var gird_<?php echo $page_id; ?> = new FancyGrid({
         { cellclick: 'onCellClick' },
         { rowdblclick: 'onRowDBLClick' },
     ],
-    <?php echo FancygridParse($fancygrid); ?>
+    <?php echo $fancygrid; ?>
 });
 </script>

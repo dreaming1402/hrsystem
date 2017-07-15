@@ -1,6 +1,4 @@
 <?php
-$GLOBALS['template'] = [];
-
 function the_template($key, $types = []) {
 	$result = '';
 	foreach ($types as $type) {
@@ -17,15 +15,15 @@ function the_template($key, $types = []) {
 }
 
 function get_template_source($key, $type) {
-	if (isset($GLOBALS['template'][$key])) {
-		return $GLOBALS['template'][$key][$type][0];
+	if (isset($GLOBALS['app_configs']['template'][$key])) {
+		return $GLOBALS['app_configs']['template'][$key][$type][0];
 	}
 }
 
 function get_template($key, $types = [], $child_key = '') {
 	$result = '';
-	if (isset($GLOBALS['template'][$key])) {
-		foreach ($GLOBALS['template'][$key] as $type => $value) {
+	if (isset($GLOBALS['app_configs']['template'][$key])) {
+		foreach ($GLOBALS['app_configs']['template'][$key] as $type => $value) {
 			foreach ($value as $child => $url) {
 				if ($child_key != '' && $child != $child_key) continue;
 				if (!in_array($type, $types)) continue;
@@ -44,13 +42,13 @@ function get_template($key, $types = [], $child_key = '') {
 }
 
 function set_template($key, $value) {
-	$GLOBALS['template'][$key] = $value;
-	return $GLOBALS['template'][$key];
+	$GLOBALS['app_configs']['template'][$key] = $value;
+	return $GLOBALS['app_configs']['template'][$key];
 }
 
 function get_templates($types = []) {
 	$result = '';
-	foreach ($GLOBALS['template'] as $key => $value) {
+	foreach ($GLOBALS['app_configs']['template'] as $key => $value) {
 		$result .= get_template($key, $types);
 	}
 	return $result;

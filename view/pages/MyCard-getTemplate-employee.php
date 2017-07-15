@@ -34,7 +34,7 @@ if (isset($_GET['pregnancy'])) {
 }
 ?>
 
-<div class="mycard CR-80 <?php echo join($mycard_class, ' '); ?>" id="[employee_id]">
+<div class="mycard-card CR-80 <?php echo join($mycard_class, ' '); ?>" id="[employee_id]">
 	<div class="layer background"><img <?php echo $background_src; ?> ></div>
 	<div class="layer company-logo"><img <?php echo $logo_src; ?> ></div>
 	<div class="layer employee-image"><img [employeeImage] ></div>

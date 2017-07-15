@@ -10,7 +10,10 @@
     - Thêm tính năng debug xem trong console.log
     - Hỗ trợ dữ liệu từ fancygrid
     1.0.0.3
-    - Thêm tính năng hiển thị thao tác .status
+    - Thêm tính năng hiển thị thao tác .class
+    1.0.0.4
+    - Sửa .status thành .output
+    - Thêm biến me đại diện cho this(root)
 */
 
 function MyCard(_options) {
@@ -23,10 +26,13 @@ function MyCard(_options) {
 
             debug: _options.debug || false,
 
-            viewerCls: _options.viewerCls || 'viewer',
-            cardCls: _options.cardCls || 'mycard',
-            hintCls: _options.hintCls || 'hint',
-            cardTemplates: _options.cardTemplates || false,
+            viewerCls: _options.viewerCls || 'mycard-viewer',
+            cardCls: _options.cardCls || 'mycard-card',
+            hintCls: _options.hintCls || 'mycard-hint',
+            outputCls: _options.outputCls || 'mycard-output',
+            cardTemplates: _options.cardTemplates || {
+                default: false,
+            },
             fields: _options.fields || [
                 'employee_id',
                 'employee_name',
@@ -35,6 +41,7 @@ function MyCard(_options) {
                 'employeeImage',
                 'print_count',
             ],
+            hint: _options.hint || false,
 
             // callback
             afterCreate: _options.afterCreate || false,
@@ -47,17 +54,19 @@ function MyCard(_options) {
         },
         debug = defaults.debug || false,
         cardList = [], // Lưu html obj
-        viewerTemplate = '<div class="'+defaults.viewerCls+'"><p class="'+defaults.hintCls+'">Empty Card</p><p class="status"></p></div></div>',
+        outputTemplate = '<p class="'+defaults.outputCls+'"></p>',
+        viewerTemplate = '<div class="'+defaults.viewerCls+'"><p class="'+defaults.hintCls+'">Empty Card</p></div></div>',
         cardTemplate = '<div class="'+defaults.cardCls+'" id="[employee_id]">[employee_id]</div>',
         cardControl = $('<div class="card-control overlay"><div class="centered"><i class="loading fa fa-refresh fa-spin text-blue"></i>'
                         +'<div class="control"><span action="'+defaults.namespace+'.RemoveCard" role="remove" class="control-action text-red"><i class="fa fa-times"></i></span></div><!--control--></div><!--centered--></div><!--overlay-->'),
 
         myCard = $(defaults.renderTo),
+        output = myCard.find('.'+defaults.outputCls),
         viewer = myCard.find('.'+defaults.viewerCls),
         hint = myCard.find('.'+defaults.hintCls),
-        status = myCard.find('.status'),
         renderCount = 0,
-        zipCount = 0;
+        zipCount = 0,
+        me = this;
     
     // Note:
     // Các hàm đều giao tiếp bằng card_id
@@ -66,43 +75,53 @@ function MyCard(_options) {
     // Setup
     this.Run = function() {
         if (!myCard.length) {
-            console.log('[MyCard Error] - "renderTo" not set');
+            // Hiển thị thông báo
+            error('"renderTo" not set', true);
             return;
-        }
+        };
+        myCard.addClass('mycard');
 
         if (!viewer.length) {
             myCard.append(viewerTemplate);
             viewer = myCard.find('.'+defaults.viewerCls);
             hint = myCard.find('.'+defaults.hintCls);
-            status = myCard.find('.status');
-        }
+        };
 
         if (!hint.length) {
             viewer.append($(viewerTemplate).find('.'+defaults.hintCls));
             hint = myCard.find('.'+defaults.hintCls);
-        }
+        } else {
+            if (defaults.hint) {                
+                hint.html(defaults.hint);
+                hint = myCard.find('.'+defaults.hintCls);
+            };
+        };
 
-        if (!status.length) {
-            viewer.append($(viewerTemplate).find('.status'));
-            status = myCard.find('.status');
-        }
+        if (!output.length) {
+            myCard.append(outputTemplate);
+            output = myCard.find('.'+defaults.outputCls);
+        };
 
-        if (!defaults.cardTemplates)
-            defaults.cardTemplates.default = cardTemplate;
+        if (typeof _options.cardTemplates == 'undefined') {
+            defaults.cardTemplates['default'] = cardTemplate;
+        } else {
+            defaults.cardTemplates.default = _options.cardTemplates.default || cardTemplate;
+        };
 
-        if (debug) console.log('[MyCard Error] - Setup completed');
+        // Cập nhập output
+        error('Setup completed');
     };
     this.Run();
 
     // Thêm Card mới bằng Obj vào danh sách
     this.AddCard = function(_obj, _template_name = 'default') {
         // Thêm vào cardList
-        var card = this.CreateCard(_obj, _template_name),
+        var card = me.CreateCard(_obj, _template_name),
             //card_id = cardList.push(card) - 1;
             card_id = _obj.employee_id;
 
         // Thêm id cho card
-        //card.attr('id', card_id);
+        card.attr('id', card_id);
         if (!card.find('.card-control').length)
             card.append(cardControl);
         card.find('.control-action').attr('action-data', card_id);
@@ -113,21 +132,21 @@ function MyCard(_options) {
         // Thêm vào viewer
         viewer.append(card);
 
-        // Cập nhập status
-        status.html('Added: '+card_id);
-
-        if (debug) console.log('[MyCard Error] - Đã thêm card('+card_id+')');
+        // Cập nhập output
+        error('Đã thêm card('+card_id+')');
 
         // calback event
         if (defaults.afterAdd)
             window[defaults.afterAdd](cardList, card);
 
         onChange();
+
+        return card_id;
     };
 
     // Xóa card bằng card_id
     this.RemoveCard = function(_card_id) {
-        var index = this.GetCardIndex(_card_id);
+        var index = me.GetCardIndex(_card_id);
 
         if (index > -1) {
             // Xóa khỏi danh sách
@@ -136,16 +155,12 @@ function MyCard(_options) {
             // Xóa khỏi viewer
             viewer.find('.'+defaults.cardCls+'#'+_card_id).parent().remove();
 
-            // Cập nhập status
-            status.html('Removed: '+_card_id);
-
-            if (debug) console.log('[MyCard Error] - Đã xóa card('+_card_id+')');
+            // Cập nhập output
+            error('Đã xóa card('+_card_id+')');
         } else {
-            // Cập nhập status
-            status.html('Remove failed: '+_card_id);
-
-            if (debug) console.log('[MyCard Error] - Không tìm thấy card('+_card_id+')');
-        }
+            // Cập nhập output          
+            error('Không tìm thấy card('+_card_id+')');
+        };
 
         // calback event
         if (defaults.afterRemove)
@@ -155,18 +170,18 @@ function MyCard(_options) {
     };
 
     // Xóa tất cả card
-    this.Clear = function(_card_id) {
+    this.Clear = function() {
         cardList = [];
         viewer.find('.'+defaults.cardCls+'-container').remove();
 
-        // Cập nhập status
-        status.html('Clear completed');
-
-        if (debug) console.log('[MyCard Error] - Đã xóa tất cả card');
+        // Cập nhập output
+        error('Đã xóa tất cả card');
 
         // calback event
         if (defaults.afterClear)
             window[defaults.afterClear](cardList);
+
+        onChange();
     };
 
     // Tìm vị trí trong cardList bằng card_id
@@ -179,11 +194,10 @@ function MyCard(_options) {
             if (card.find('.'+defaults.cardCls).attr('id') == _card_id) {
                 // Trả về giá trị index
                 index = i;
-                return;
+                return index;
             };
         });
-
-        if (debug) console.log('[MyCard Error] - Find index card('+_card_id+')='+index);
+        
         return index;
     };
 
@@ -206,10 +220,10 @@ function MyCard(_options) {
 
         // set template
         card = card.ReplaceAll('[template_name]', _template_name);
-
-        if (debug) console.log('[MyCard Error] - Tạo card thành công');
-
         card = $(card);
+
+        // Cập nhập output
+        error('Tạo card thành công');
 
         // calback event
         if (defaults.afterCreate)
@@ -227,9 +241,10 @@ function MyCard(_options) {
             MC = this;
 
         if (!card.length) {
-            if (debug) console.log('[MyCard Error] - Không tìm thấy card('+_card_id+')');
+            // Hiện thông báo
+            error('Không tìm thấy card('+_card_id+')', true);
             return;
-        }
+        };
 
         // Xóa ảnh đã render
         card_outer.find('canvas.'+defaults.cardCls+'-render').remove();
@@ -242,8 +257,6 @@ function MyCard(_options) {
         canvas.width = card.width()*2;
         canvas.height = card.height()*2;
 
-        console.log(card.outerHTML);
-
         // Chạy api tạo hình ảnh đổ vào canvas
         rasterizeHTML.drawHTML(card_outer.html(), canvas, {zoom:2})
         .then(function success(renderResult) {
@@ -252,10 +265,8 @@ function MyCard(_options) {
             // Đánh dấu đã thành công bằng
             card_outer.attr('class', defaults.cardCls+'-container success');
 
-            if (debug) console.log('[MyCard Error] - Tạo ảnh thành công: card('+_card_id+')');
-            
-            // Cập nhập status
-            status.html('Rending completed: '+_card_id);
+            // Cập nhập output
+            error('Tạo ảnh thành công: card('+_card_id+')');
 
             // Tự động download
             if (_auto_download)
@@ -264,11 +275,9 @@ function MyCard(_options) {
             // Đánh dấu tạo ảnh không thành công
             card_outer.attr('class', defaults.cardCls+'-container error');
 
-            // Cập nhập status
-            status.html('Rending failed: '+_card_id);
-
-            if (debug) {
-                console.log('[MyCard Error] - Tạo ảnh thất bại: card('+_card_id+')');                
+            // Cập nhập output
+            error('Tạo ảnh thất bại: card('+_card_id+')');
+            if (debug) {                
                 console.log(e);
             };
         });
@@ -291,10 +300,10 @@ function MyCard(_options) {
 
         if (!card_outers.length) {
             if (_auto_download)
-                zipAll();
+                me.zipAll();
 
             return;
-        }
+        };
 
         var card = $(card_outers.find('.'+defaults.cardCls)[0]),
             card_outer = card.parent(),
@@ -304,9 +313,9 @@ function MyCard(_options) {
             MC = this;
 
         if (!card.length) {
-            if (debug) console.log('[MyCard Error] - Không tìm thấy card('+card_id+')');
+            error('Không tìm thấy card('+card_id+')');
             return;
-        }
+        };
 
         // Xóa ảnh đã render
         card_outer.find('canvas.'+defaults.cardCls+'-render').remove();
@@ -327,11 +336,9 @@ function MyCard(_options) {
             // Đánh dấu đã thành công bằng
             card_outer.attr('class', defaults.cardCls+'-container success');
 
-            if (debug) console.log('[MyCard Error] - Tạo ảnh thành công: card('+card_id+')');
-
-            // Cập nhập status
+            // Cập nhập output
             renderCount++;
-            status.html('Rending completed: '+renderCount+'/'+cardList.length);
+            error('Rending completed: '+renderCount+'/'+cardList.length);
 
             // Next
             MC.CreateImageAll(false, _auto_download);
@@ -340,7 +347,7 @@ function MyCard(_options) {
             card_outer.attr('class', defaults.cardCls+'-container error');
 
             if (debug) {
-                console.log('[MyCard Error] - Tạo ảnh thất bại: card('+card_id+')');
+                error('Tạo ảnh thất bại: card('+card_id+')');
                 console.log(e);
             };
         });
@@ -357,9 +364,9 @@ function MyCard(_options) {
         // Kiểm tra nếu đã tồn tại image thì mới download
         // Nếu không tồn tại thì gọi hàm tạo ảnh và tự động down về
         if (!renders.length) {
-            this.CreateImage(_card_id, true);
+            me.CreateImage(_card_id, true);
             return;
-        }
+        };
 
         // Nếu đã tồn tại render thì tiếp tục download
         var zip = new JSZip(),
@@ -374,11 +381,8 @@ function MyCard(_options) {
         // Đóng gói và tải xuống
         zip.generateAsync({type:'blob'}).then(function(content) {
             saveAs(content, zip_name+'_'+_card_id+'.zip');
-            if (debug) console.log('[MyCard Error] - Tải về thành công '+zip_name+'_'+_card_id+'.zip');
+            error('Tải về thành công '+zip_name+'_'+_card_id+'.zip');
         });
-
-        // Cập nhập status
-        status.html('Zip completed: '+_card_id);
 
         // calback event
         if (defaults.afterDownload)
@@ -387,7 +391,7 @@ function MyCard(_options) {
 
     // Tải tất cả ảnh (gọi hàm CreateImageAll(true, true));
     this.DownloadCardAll = function() {
-        this.CreateImageAll(true, true);
+        me.CreateImageAll(true, true);
     };
 
     // Hàm add tất cả ảnh vào 1 file
@@ -397,11 +401,9 @@ function MyCard(_options) {
         // Kiểm tra xem có ảnh hay không
         // Nếu không thì thoát
         if (!renders.length) {
-            var mess = 'Không tìm thấy ảnh để tải về';
-            alert(mess);
-            if (debug) console.log('[MyCard Error] - '+mess);
+            error('Không tìm thấy ảnh để tải về', true);
             return;
-        }
+        };
 
         // Nếu có thì tiếp tục
         var zip = new JSZip(),
@@ -420,9 +422,9 @@ function MyCard(_options) {
             // Thêm file vào zip
             zip_folder.file(img_name, img_data.split('base64,')[1], {base64: true});
 
-            // Cập nhập status
+            // Cập nhập output
             zipCount++;
-            status.html('Zip completed: '+zipCount+'/'+cardList.length);
+            error('Zip completed: '+zipCount+'/'+cardList.length);
 
             // calback event
             if (defaults.afterDownload)
@@ -433,19 +435,19 @@ function MyCard(_options) {
         zip.generateAsync({type:'blob'}).then(function(content) {
             if (renders.length == 1) {
                 saveAs(content, zip_name+'_'+card_id+'.zip');
-                if (debug) console.log('[MyCard Error] - Tải về thành công '+zip_name+'_'+card_id+'.zip');
+                error('Tải về thành công '+zip_name+'_'+card_id+'.zip');
             } else {
                 saveAs(content, zip_name+'.zip');
-                if (debug) console.log('[MyCard Error] - Tải về thành công '+zip_name+'.zip');
-            }
+                error('Tải về thành công '+zip_name+'.zip');
+            };
         });
     };
 
-    // Update gui
-    function onChange() {
-        var card = viewer.find('.'+defaults.cardCls+'-container:not(.'+defaults.cardCls+'-container.demo)');
+    // Update GUI
+    function onChange() { // done
+        var cards = viewer.find('.'+defaults.cardCls+'-container:not(.'+defaults.cardCls+'-container.demo)');
 
-        if (card.length)
+        if (cards.length)
             hint.addClass('hidden');
         else
             hint.removeClass('hidden');
@@ -455,9 +457,9 @@ function MyCard(_options) {
             card.find('.overlay .loading').css('zoom', '100%');
             card.find('.overlay span').css('zoom', '100%');
         } else {*/
-            card.css('zoom', '50%');
-            card.find('.overlay .loading').css('zoom', '200%');
-            card.find('.overlay span').css('zoom', '200%');
+            cards.css('zoom', '50%');
+            cards.find('.overlay .loading').css('zoom', '200%');
+            cards.find('.overlay span').css('zoom', '200%');
         //}
 
 
@@ -465,4 +467,11 @@ function MyCard(_options) {
         if (defaults.afterChange)
             window[defaults.afterChange](cardList);
     };
-}
+
+    // Error handler
+    function error(_message, _show_alert = false) { // done
+        if (_show_alert) alert(_message);
+        if (debug) console.log('[Upload Error] - ' + _message);
+        output.text(_message);
+    };
+};

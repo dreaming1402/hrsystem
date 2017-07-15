@@ -11,7 +11,7 @@
             </div><!--box-header-->
 
         	<div class="box-body">
-            	<div id="employee_uploadImage">
+            	<div id="uploader_<?php echo $page_id; ?>">
 				    <p class="help-block">Chỉ đăng tải file hình ảnh (*.png)</p>
             	</div><!--uploadImage-->
             </div><!--box-body-->
@@ -20,17 +20,19 @@
 
 </div><!--row-->
 <script>
-var upload_eui = new Upload({
-	renderTo: '#employee_uploadImage',
-	server: {
+var uploader_<?php echo $page_id; ?> = new Uploader({
+    renderTo: '#uploader_<?php echo $page_id; ?>',
+    debug: true,
+    autoUpload: true,
+    multiFile: true,
+    overwrite: true,
+    maxSize: 5, //mb    
+    server: {
         upload: '?c=File&a=upload&t=employeeImage',
         delete: '?c=File&a=delete&t=employeeImage',
     },
-    hint: '<button action="upload_eui.browers" class="control-action btn btn-default">Chọn</button> hoặc kéo thả ảnh (.png) vào đây',
-	extensions: ['png'],
-	autoSend: true,
-	maxSize: 5, //mb
-	multiple: true,
-    namespace: 'upload_eui',
+    namespace: 'uploader_<?php echo $page_id; ?>',
+    hint: '<button action="uploader_<?php echo $page_id; ?>.Browers" class="control-action btn btn-default">Chọn</button> hoặc kéo thả ảnh (.png) vào đây',
+    extensions: ['png'],
 });
 </script>

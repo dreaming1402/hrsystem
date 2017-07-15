@@ -74,7 +74,7 @@ class PrintCard_Controller extends Base_Controller
 
 				if ($query_flag) {
 					$data['response']['success'] = true;
-		            $data['response']['message'] = 'Đã chuyển vào thùng rác';
+		            $data['response']['message'] = 'Đã khôi phục thành công';
 		            $data['response']['data']['id'] = $id;
 				}
 				
@@ -124,7 +124,7 @@ class PrintCard_Controller extends Base_Controller
     }
 
 	public function historyAction() { // done
-		$this->helper->load('Fancygrid');
+		$this->library->load('Fancygrid');
 
     	$data = [
 	        'page_title'=> 'Lịch sử in thẻ',
@@ -290,11 +290,14 @@ class PrintCard_Controller extends Base_Controller
 	        ],
 	    ];
 
+	    // Rebuild fancygrid
+    	$data['fancygrid'] = $this->library->Fancygrid->FancygridParse($data['fancygrid']);
+
 		$this->view->load('main', $data);
     }
 
 	public function trashAction() { // done		
-		$this->helper->load('Fancygrid');
+		$this->library->load('Fancygrid');
 
     	$data = [
 	        'page_title'=> 'Lịch sử in thẻ đã xóa',
@@ -458,6 +461,9 @@ class PrintCard_Controller extends Base_Controller
 	        	],
 	        ],
 	    ];
+
+	    // Rebuild fancygrid
+    	$data['fancygrid'] = $this->library->Fancygrid->FancygridParse($data['fancygrid']);
 
 		$this->view->load('main', $data);
     }

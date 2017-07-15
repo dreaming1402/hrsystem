@@ -105,6 +105,13 @@ var grid_<?php echo $page_id; ?> = new FancyGrid({
 				})
 			}
 		},
+        {
+            text: 'Tải lại bảng',
+            tip: 'Refresh',
+            handler: function(){
+                this.load();
+            }
+        },
 		{
 			text: 'Xuất ra Excel',
             tip: 'Tạm thời chỉ xuất được file .csv, upload mở trong Google Drive để đọc được chữ tiếng Việt',
@@ -118,6 +125,6 @@ var grid_<?php echo $page_id; ?> = new FancyGrid({
 	}, {
 		clearselect: 'onClearSelect'
 	}],
-<?php echo FancygridParse($fancygrid); ?>
+<?php echo $fancygrid; ?>
 });
 </script>

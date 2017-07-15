@@ -8,29 +8,52 @@ class File_Controller extends Base_Controller
             $this->error(500);
     }
 
-    public function uploadAction() {
+    public function uploadAction() { // done
+        if ($this->method != 'POST')
+            $this->error(503);
+
+        // Define
         $data = [
             'response'  => [
                 'success'   => false,
-                'message'   => 'Tải lên không thành công',
-                'data'      => [],
+                'message'   => 'Upload file missing',
+                'data'      => 0,
             ],
         ];
 
         if (isset($_FILES['file'])) {
-            $this->helper->load('Upload');
+            $this->library->load('Uploader');
 
-            $rename = '/'.$_GET['t'].'/'.$_FILES['file']['name'];
-            $upload_file = upload_file($_FILES['file'], $rename);
+            $file_name = $_FILES['file']['name'];
+            if ($_POST['rename'] != 'false')
+                $file_name = $_POST['rename'];
 
-            if ($upload_file) {
+            $des_file = UPLOAD_DIR.'/'.$_GET['t'].'/'.$file_name;
+
+            $upload_flag = $this->library->Uploader->UploadFile($_FILES['file'], $des_file, $_POST['overwrite'] == 'true');
+
+            if ($upload_flag == -2) {
                 $data = [
-                    'response'  => [
+                    'response' => [
+                        'success'   => false,
+                        'message'   => 'File empty',
+                        'data'      => $upload_flag,
+                    ],
+                ];
+            } else if ($upload_flag == -1) {
+               $data = [
+                    'response' => [
+                        'success'   => false,
+                        'message'   => 'Duplicate file',
+                        'data'      => $upload_flag,
+                    ],
+                ];
+            } else {
+                $data = [
+                    'response' => [
                         'success'   => true,
-                        'message'   => 'Đã tải lên thành công',
-                        'data'      => [
-                            'file'   => $upload_file,
-                        ],
+                        'message'   => 'Upload success',
+                        'data'      => $upload_flag,
                     ],
                 ];
             }
@@ -322,67 +345,65 @@ class File_Controller extends Base_Controller
         $this->view->load('json', $data);
     }
 
-    public function deleteAction() {
+    public function deleteAction() { // done
+        if ($this->method != 'DELETE')
+            $this->error(503);
+
         $data = [
             'response'  => [
                 'success'   => false,
-                'message'   => 'Xóa file không thành công',
+                'message'   => 'File not found',
                 'data'      => [],
             ],
         ];
 
-        if (isset($_GET['id'])) {
-            $file = $_GET['id'];//UPLOAD_DIR.'/'.$_GET['t'].'/'.$_GET['id'].'.png';
+        if (isset($_GET['id'])&&isset($_GET['ext'])) {
+            $this->library->load('Uploader');
 
-            //mod for project
-            switch (strtolower($_GET['t'])) {
-                case 'employeedatabase':
-                    $file = UPLOAD_DIR.'/'.$_GET['t'].'/'.$_GET['id'].'.xlsx';
-                    break;
-                
-                case 'employeeimage':
-                    $file = UPLOAD_DIR.'/'.$_GET['t'].'/'.$_GET['id'].'.png';
-                    break;
+            $des_file = UPLOAD_DIR.'/'.$_GET['t'].'/'.$_GET['id'].'.'.$_GET['ext'];
+            $delete_flag = $this->library->Uploader->DeleteFile($des_file);
+
+            if ($_GET['t'] == 'employeeImage') {
+                $compress_image = UPLOAD_DIR.'/'.$_GET['t'].'/compress/'.$_GET['id'].'.'.$_GET['ext'];
+                $this->library->Uploader->DeleteFile($compress_image);
             }
 
-            if (file_exists($file)) {
-                $delete_file = unlink($file);
-                if ($_GET['t'] == 'employeeImage') {
-                    $compress_image = UPLOAD_DIR.'/'.$_GET['t'].'/compress/'.$_GET['id'].'.png';
-                    if (file_exists($compress_image)) {
-                        unlink($compress_image);
-                    }
-                }
-
-                if ($delete_file) {
-                    $data = [
-                        'response'  => [
-                            'success'   => true,
-                            'message'   => 'Đã xóa',
-                            'data'      => [
-                                'file'   => $file,
-                            ],
-                        ],
-                    ];
-                }
-            } else {
+            if ($delete_flag == -2) {
                 $data = [
                     'response'  => [
                         'success'   => false,
-                        'message'   => 'Không tìm thấy file cần xóa',
-                        'data'      => [
-                            'file'   => $file,
-                        ],
+                        'message'   => 'File empty',
+                        'data'      => $delete_flag,
                     ],
                 ];
-            }
-            
+            } else if ($delete_flag == -1) {
+                $data = [
+                    'response'  => [
+                        'success'   => false,
+                        'message'   => 'File not found',
+                        'data'      => $delete_flag,
+                    ],
+                ];
+            } else {
+                $data = [
+                    'response'  => [
+                        'success'   => true,
+                        'message'   => 'Delete success',
+                        'data'      => $delete_flag,
+                    ],
+                ];
+            }            
         }
 
         $this->view->load('json', $data);
     }
 
-    public function send($method, $server, $data) {
+    public function exportXlsxAction() {
+        if ($this->method != 'POST')
+            $this->error(404);
+    }
+
+    public function send($method, $server, $data) { // Hàm dùng để request API bằng php
         $method = strtoupper($method);
 
         $opts = [

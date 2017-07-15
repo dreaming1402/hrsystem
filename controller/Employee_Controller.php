@@ -17,7 +17,7 @@ class Employee_Controller extends Base_Controller
 			return;
     	}
 
-        $this->helper->load('Fancygrid');
+        $this->library->load('Fancygrid');
     	$data = [
     		'page_title'=> 'In thẻ nhân viên',
 	        'page_id'   => $this->page_id,
@@ -186,6 +186,20 @@ class Employee_Controller extends Base_Controller
 		        			'action'=> 'cellclick',
 		        		]
 		        	],
+		        	/*[ // action
+		        		'type'	=> 'action',
+				        'title'	=> 'Xem',
+		        		'width'	=> 40,
+		        		'locked'=> true,
+		        		'filter'=> false,
+		        		'value'	=> '',
+		        		'items'	=> [
+		        			'text'	=> '<i class="fa fa-eye"></i>',
+		        			'cls'	=> 'action-print_card',
+		        			'action'=> 'cellclick',
+		        		],
+						'locked' => true,
+		        	],*/
 		        	[ // employee_department
 						'type'	=> 'combo',
 		        		'index'	=> 'employee_department',
@@ -408,11 +422,14 @@ class Employee_Controller extends Base_Controller
 						'rightLocked' => true,
 						'width'	=> 50,
 		        	],
-		        		/*]
-		        	],*/
 	        	],
 	        ],
     	];
+
+	    // Rebuild fancygrid
+    	$data['fancyform'] = $this->library->Fancygrid->FancyformParse($data['fancyform']);
+    	$data['fancygrid'] = $this->library->Fancygrid->FancygridParse($data['fancygrid']);
+    	$data['childgrid'] = $this->library->Fancygrid->FancygridParse($data['childgrid']);
 
 		$this->view->load('main', $data);
     }
@@ -534,4 +551,24 @@ class Employee_Controller extends Base_Controller
 				
 		return $data;
 	}
+
+	public function uploadImageAction() { // done
+		$this->library->load('Uploader');
+
+    	$data = [
+			'page_title'	=> 'Tải lên ảnh thẻ nhân viên',
+			'page_id'		=> $this->page_id,
+		];
+
+		$this->view->load('main', $data);
+    }
+
+    public function importDataAction() { // done
+    	$data = [
+			'page_title'	=> 'Tải lên danh sách nhân viên',
+			'page_id'		=> $this->page_id,
+		];
+
+		$this->view->load('main', $data);
+    }
 }
