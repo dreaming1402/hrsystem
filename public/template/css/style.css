@@ -70,6 +70,11 @@
 	}
 }*/
 
+.mycard-viewer {
+	max-height: 300px;
+	overflow-x: auto;
+}
+
 a[href*='fancygrid.com'] {display: none !important;}
 .box .fancy.fancy-panel:not(.fancy-panel-draggable) { width: 100% !important; }
 .fancy-theme-staff .fancy-grid-cell-inner {

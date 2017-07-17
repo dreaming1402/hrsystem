@@ -27,7 +27,7 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
         grid.tbar[1].disable();
     },
     moveToTrash: function(item) {
-        $.ajax({
+        new $.ajax({
             url: '?c=<?php echo $controller; ?>&a=moveToTrash&id='+item.id,
             method: 'PUT',
             success: function(data) {
@@ -39,7 +39,34 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
                 }
             },
         });
-    }
+    },
+    exportExcel: function(grid) {
+        var rows = grid.getDataView(),
+            col_names = [];
+
+        if (rows.length) {
+            $.each(rows[0], function(key, value) {
+                col_names.push(key);
+            });
+        };
+
+        new $.ajax({
+            url: '?c=File&a=exportExcel&t=<?php echo $page_id; ?>',
+            data: {data: rows, header: [col_names]},
+            method: 'POST',
+            success: function(data) {
+                if (data.success) {
+                    $('#alert-area').html('<div class="alert alert-success alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.message+' '+data.data+'</div>');
+                    window.location = this.url+'&f='+data.data;
+                } else {
+                    $('#alert-area').html('<div class="alert alert-warning alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.message+'</div>');
+                };
+            },
+            error: function() {
+                $('#alert-area').html('<div class="alert alert-warning alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Export error</div>');
+            },
+        });
+    },
 });
 var grid_<?php echo $page_id; ?> = new FancyGrid({
     title: '<?php echo $page_title; ?>',
@@ -83,10 +110,9 @@ var grid_<?php echo $page_id; ?> = new FancyGrid({
         },
         {
             text: 'Xuất ra Excel',
-            tip: 'Tạm thời chỉ xuất được file .csv, upload mở trong Google Drive để đọc được chữ tiếng Việt',
             handler: function() {
-                FancygridToCsv('#grid_<?php echo $page_id; ?>', '<?php echo $page_title; ?>.csv');
-            },
+                this.exportExcel(this);
+            }
         }
     ],
     events: [{

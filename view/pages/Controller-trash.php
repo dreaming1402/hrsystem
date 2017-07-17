@@ -31,7 +31,7 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
 		grid.tbar[2].disable();
 	},
 	restoreFromTrash: function(item) {
-		$.ajax({
+		new $.ajax({
         	url: '?c=<?php echo $controller; ?>&a=restoreFromTrash&id='+item.id,
         	method: 'PUT',
 			success: function(data) {
@@ -45,7 +45,7 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
 		});
 	},
 	permanentlyDelete: function(item) {
-		$.ajax({
+		new $.ajax({
         	url: '?c=<?php echo $controller; ?>&a=permanentlyDelete&id='+item.id,
         	method: 'DELETE',
 			success: function(data) {
@@ -57,7 +57,34 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
 	            }
 			},
 		});
-	}
+	},
+    exportExcel: function(grid) {
+        var rows = grid.getDataView(),
+            col_names = [];
+
+        if (rows.length) {
+            $.each(rows[0], function(key, value) {
+                col_names.push(key);
+            });
+        };
+
+        new $.ajax({
+            url: '?c=File&a=exportExcel&t=<?php echo $page_id; ?>',
+            data: {data: rows, header: [col_names]},
+            method: 'POST',
+            success: function(data) {
+                if (data.success) {
+                    $('#alert-area').html('<div class="alert alert-success alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.message+' '+data.data+'</div>');
+                    window.location = this.url+'&f='+data.data;
+                } else {
+                    $('#alert-area').html('<div class="alert alert-warning alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.message+'</div>');
+                };
+            },
+            error: function() {
+                $('#alert-area').html('<div class="alert alert-warning alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Export error</div>');
+            },
+        });
+    },
 });
 
 var grid_<?php echo $page_id; ?> = new FancyGrid({
@@ -114,10 +141,9 @@ var grid_<?php echo $page_id; ?> = new FancyGrid({
         },
 		{
 			text: 'Xuất ra Excel',
-            tip: 'Tạm thời chỉ xuất được file .csv, upload mở trong Google Drive để đọc được chữ tiếng Việt',
-			handler: function() {
-				fancygrid_2_csv('#grid_<?php echo $page_id; ?>', '<?php echo $page_title; ?>.csv');
-			}
+            handler: function(){
+                this.exportExcel(this);
+            }
 		}
 	],
 	events: [{

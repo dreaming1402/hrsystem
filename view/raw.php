@@ -1,5 +1,5 @@
 <?php
 //header("Access-Control-Allow-Origin: *");
 if (!isset($page))
-	$page = 'pages/'.$_GET['c'].'-'.$_GET['a'].'.php';
+	$page = 'pages/'.$controller.'-'.$action.'.php';
 include_once $page; ?>

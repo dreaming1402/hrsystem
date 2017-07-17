@@ -9,7 +9,7 @@
             </h3>
             <p>
                 We will work on fixing that right away.
-Meanwhile, you may <?php the_homepage('return to dashboard', false); ?>
+Meanwhile, you may <?php TheHomePage('return to dashboard', false); ?>
                 or try using the search form.
 
             </p>

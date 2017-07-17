@@ -5,19 +5,19 @@
 
     <section class="content-header">
         <h1>
-            <?php echo ucwords($_GET['c']); ?>
-            <small><?php echo ucwords($_GET['a']); ?></small>
+            <?php echo ucwords($controller); ?>
+            <small><?php echo ucwords($action); ?></small>
         </h1>
         <ol class="breadcrumb">
             <li>
-                <?php the_homepage(); ?>
+                <?php TheHomePage(); ?>
             </li>
-            <li class="active"><?php echo ucwords($_GET['c']); ?></li>
+            <li class="active"><?php echo ucwords($controller); ?></li>
         </ol><!--breadcrumb-->
     </section><!--content-header-->
 
     <section class="content">
-	   <?php include_once isset($page) ? $page : 'pages/'.$_GET['c'].'-'.$_GET['a'].'.php'; ?>
+	   <?php include_once isset($page) ? $page : 'pages/'.$controller.'-'.$action.'.php'; ?>
     </section><!--content-->
 
 </div><!--content-wrapper-->

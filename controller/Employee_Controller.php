@@ -3,9 +3,9 @@ class Employee_Controller extends Base_Controller
 {
     public function printCardAction() { // done
     	if ($this->method == 'POST') {
-			$this->model->load('API');
+			$this->model->Load('API');
 
-    		$query = $this->model->API->new_row('db_print_card', $_POST);
+    		$query = $this->model->API->InsertRow('db_print_card', $_POST);
 			$data = [
 				'response' => [
 					'success' => $query != false,
@@ -13,14 +13,26 @@ class Employee_Controller extends Base_Controller
 				],
 			];
 
-			$this->view->load('json', $data);
+			$this->view->Load('json', $data);
 			return;
     	}
+    	
+    	// Library
+		RegisterScript('rasterizehtml', 'js', TEMPLATE_DIR . '/plugins/RasterizeHTML/rasterizeHTML.allinone.js');
+		RegisterScript('jszip', 'js', TEMPLATE_DIR . '/plugins/JsZip/jszip.min.js');
+		RegisterScript('filesaver', 'js', TEMPLATE_DIR . '/plugins/FileSaver/FileSaver.js');
+		// My Card
+		RegisterScript('mycard', 'css', TEMPLATE_DIR . '/plugins/MyCard/mycard.css');
+		RegisterScript('mycard-employee', 'css', TEMPLATE_DIR . '/plugins/MyCard/mycard-employee.css');
+		RegisterScript('mycard-visitor', 'css', TEMPLATE_DIR . '/plugins/MyCard/mycard-visitor.css');
+		RegisterScript('mycard-constructor', 'css', TEMPLATE_DIR . '/plugins/MyCard/mycard-constructor.css');
 
-        $this->library->load('Fancygrid');
+		RegisterScript('mycard', 'js', TEMPLATE_DIR . '/plugins/MyCard/mycard.js');
+
+        $this->library->Load('Fancygrid');
+
     	$data = [
     		'page_title'=> 'In thẻ nhân viên',
-	        'page_id'   => $this->page_id,
 
 	        'fancyform'	=> [
 	        	'items'	=> [
@@ -189,6 +201,7 @@ class Employee_Controller extends Base_Controller
 		        	/*[ // action
 		        		'type'	=> 'action',
 				        'title'	=> 'Xem',
+				        'index'	=> 'action_view',
 		        		'width'	=> 40,
 		        		'locked'=> true,
 		        		'filter'=> false,
@@ -464,12 +477,12 @@ class Employee_Controller extends Base_Controller
     	$data['fancygrid'] = $this->library->Fancygrid->FancygridParse($data['fancygrid']);
     	$data['childgrid'] = $this->library->Fancygrid->FancygridParse($data['childgrid']);
 
-		$this->view->load('main', $data);
+		$this->view->Load('main', $data);
     }
 
     public function getPrintListAction() { //done
     	// Define
-		$data = $this->getData($_GET);
+		$data = $this->getData($_GET, false);
 
 		// lấy index theo field i
 		$index_data = [];
@@ -491,11 +504,11 @@ class Employee_Controller extends Base_Controller
 			];
 		};
 
-		$this->view->load('json', $data);
+		$this->view->Load('json', $data);
 	}
 
 	private function getData($_where, $_trash = false) { // done
-		$this->model->load('API');
+		$this->model->Load('API');
 
 		$data_file = 'http://localhost:81/data.json';
 		// báo lỗi không tìm thấy dữ liệu
@@ -534,7 +547,7 @@ class Employee_Controller extends Base_Controller
 			$sql_print_card['where'][0]['id'] = $_where['id'];
 		};
 
-		$print_card_data = $this->model->API->get_table($sql_print_card);
+		$print_card_data = $this->model->API->ExecuteQuery($sql_print_card);
 		$print_data = [];
 		foreach ($print_card_data as $index => $row) {
 			$print_data[$row['employee_id']] = $row;
@@ -595,22 +608,21 @@ class Employee_Controller extends Base_Controller
 	}
 
 	public function uploadImageAction() { // done
-		$this->library->load('Uploader');
+		$this->library->Load('Uploader');
 
     	$data = [
 			'page_title'	=> 'Tải lên ảnh thẻ nhân viên',
-			'page_id'		=> $this->page_id,
 		];
 
-		$this->view->load('main', $data);
+		$this->view->Load('main', $data);
     }
 
     public function importDataAction() { // done
     	$data = [
 			'page_title'	=> 'Tải lên danh sách nhân viên',
-			'page_id'		=> $this->page_id,
+			'table_name'	=> 'db_employee',
 		];
 
-		$this->view->load('main', $data);
+		$this->view->Load('main', $data);
     }
 }

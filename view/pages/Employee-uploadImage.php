@@ -7,7 +7,7 @@
         <div class="box box-default">
             <div class="box-header">
                 <i class="fa fa-upload"></i>
-                <h3 class="box-title">Tải lên ảnh thẻ</h3>
+                <h3 class="box-title"><?php echo $page_title; ?></h3>
             </div><!--box-header-->
 
         	<div class="box-body">

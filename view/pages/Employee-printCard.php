@@ -52,6 +52,7 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
     },
     onCellClick: function(grid, o) { // done
         if (o.column.title == 'Tải') {
+            if(employeeCard) employeeCard.Clear();
             grid.printCard(o.data);
         } else if (o.column.title == 'Xem') {
             grid.viewDetail(o.data);
@@ -60,16 +61,26 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
     onRowDBLClick: function(grid, o) {
         grid.viewDetail(o.data);
     },
-    printCard: function(item) { // done
+    printCardAll: function(grid) {
+        var items = grid.getSelection(),
+            me = this;
+        if(employeeCard) employeeCard.Clear();
+        $.each(items, function(index, item) {
+            me.printCard(item);
+        });
+
+        //alert('Tính năng này chưa có sẵn');
+    },
+    printCard: function(_item) { // done
         var me = this,
             printCardForm = me.printCardForm;
 
         // Set template_name
         var template_name = [],
-            contract_type = item.contract_type.toLowerCase(),
-            employee_type = item.employee_type.toLowerCase(),
-            employee_department = item.employee_department.toLowerCase(),
-            maternity_type = item.maternity_type.toLowerCase(),            
+            contract_type = _item.contract_type.toLowerCase(),
+            employee_type = _item.employee_type.toLowerCase(),
+            employee_department = _item.employee_department.toLowerCase(),
+            maternity_type = _item.maternity_type.toLowerCase(),            
             unlimit = ['packing 1', 'packing 2'];
 
         if (employee_type == 'worker')
@@ -90,15 +101,12 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
 
         // Kiểm tra đã tạo form in thì bỏ qua bước tạo obj
         if (printCardForm) {
-            // Xóa thẻ nếu có
-            employeeCard.Clear();
-
             // Thêm mới thẻ được chọn
-            employeeCard.AddCard(item, template_name);
+            employeeCard.AddCard(_item, template_name);
 
             // Cập nhập form
-            printCardForm.set(item);
-            printCardForm.set('print_card_id', item.employee_id);
+            printCardForm.set(_item);
+            printCardForm.set('print_card_id', _item.employee_id);
 
             // Hiển thị form
             printCardForm.show();
@@ -143,17 +151,28 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
                             };
 
                             employeeCard.DownloadCardAll();
+                            
+                            var print_form = this,
+                                print_card_type = this.get('print_card_type'),
+                                print_description = this.get('print_description');
+                            $.each(new $('.mycard-card-container'), function(key, value) {
+                                var employee_id = $(value).attr('id'),
+                                    item = grid_<?php echo $page_id; ?>.findItem('employee_id', employee_id);
 
-                            this.submit();
+                                    SubmitForm(item[0].data, print_form, print_card_type, print_description);
+                            });
+
                             this.hide();
+
+                            $('#alert-area').html('<div class="alert alert-success alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Đã tải về thành công</div>');
                         }
                     }
                 ],
                 events: [{
                     init: function() {
                         // Fill all fields
-                        this.set(item);
-                        this.set('print_card_id', item.employee_id);
+                        this.set(_item);
+                        this.set('print_card_id', _item.employee_id);
 
                         // Hiển thị form
                         this.show();
@@ -185,7 +204,7 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
                 },
             });
 
-            employeeCard.AddCard(item, template_name);
+            employeeCard.AddCard(_item, template_name);
         };
 
         // Clear những field cần nhập
@@ -200,15 +219,25 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
             me.printCardForm.set('print_card_type', 'Thẻ con nhỏ');
         else
             me.printCardForm.set('print_card_type', '');
+
+        // Mod submit
+        function SubmitForm(_item, _form, _print_card_type, _print_description) {
+            _form.set(_item);
+            _form.set('print_card_id', _item.employee_id);
+            _form.set('print_card_type', _print_card_type);
+            _form.set('print_description', _print_description);
+            _form.submit();
+        };
     },
-    viewDetail: function(item) {
+    viewDetail: function(_item) {
         var me = this,
             viewDetailGrid = me.viewDetailGrid;
 
-        // Nếu đã tồn tại gird
+        // Nếu đã tồn tại grid
         if (viewDetailGrid) {
-            viewDetailGrid.data.proxy.api.read = '?c=PrintCard&a=getData&employee_id='+item.employee_id;
+            viewDetailGrid.data.proxy.api.read = '?c=PrintCard&a=getData&employee_id='+_item.employee_id;
 
+            viewDetailGrid.setSubTitle(_item.employee_id+' - '+_item.employee_name);
             viewDetailGrid.load();
             viewDetailGrid.show();
         } else {
@@ -234,7 +263,7 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
                 draggable: true,
                 height: 400,
                 title: {
-                    text: 'Chi tiết',
+                    text: 'Chi tiết lịch sử in thẻ',
                     tools: [
                         {
                             text: 'Đóng',
@@ -243,6 +272,9 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
                             }
                         }
                     ]
+                },
+                subTitle: {
+                    text: _item.employee_id+' - '+_item.employee_name,
                 },
                 buttons: ['side',
                     {
@@ -255,7 +287,7 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
                 data: {
                     proxy: {
                         api: {
-                            read: '?c=PrintCard&a=getData&employee_id='+item.employee_id,
+                            read: '?c=PrintCard&a=getData&employee_id='+_item.employee_id,
                         },
                     },
                 },
@@ -265,8 +297,35 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
 
         me.viewDetailGrid = viewDetailGrid;
     },
+    exportExcel: function(grid) {
+        var rows = grid.getDataView(),
+            col_names = [];
+
+        if (rows.length) {
+            $.each(rows[0], function(key, value) {
+                col_names.push(key);
+            });
+        };
+
+        new $.ajax({
+            url: '?c=File&a=exportExcel&t=<?php echo $page_id; ?>',
+            data: {data: rows, header: [col_names]},
+            method: 'POST',
+            success: function(data) {
+                if (data.success) {
+                    $('#alert-area').html('<div class="alert alert-success alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.message+' '+data.data+'</div>');
+                    window.location = this.url+'&f='+data.data;
+                } else {
+                    $('#alert-area').html('<div class="alert alert-warning alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.message+'</div>');
+                };
+            },
+            error: function() {
+                $('#alert-area').html('<div class="alert alert-warning alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Export error</div>');
+            },
+        });
+    },
 });
-var gird_<?php echo $page_id; ?> = new FancyGrid({
+var grid_<?php echo $page_id; ?> = new FancyGrid({
     title: '<?php echo $page_title; ?>',
 	renderTo: 'grid_<?php echo $page_id; ?>',
 	theme: 'blue',
@@ -300,7 +359,7 @@ var gird_<?php echo $page_id; ?> = new FancyGrid({
             tip: 'Bôi đen nhiều hàng để in nhiều người',
             disabled: true,
             handler: function(){
-                alert('Tính năng này chưa có sẵn');
+                this.printCardAll(this);
             }
         },
         {
@@ -318,9 +377,8 @@ var gird_<?php echo $page_id; ?> = new FancyGrid({
         },
         {
             text: 'Xuất ra Excel',
-            tip: 'Tạm thời chỉ xuất được file .csv, upload mở trong Google Drive để đọc được chữ tiếng Việt',
             handler: function() {
-                FancygridToCsv('#grid_<?php echo $page_id; ?>', '<?php echo $page_title; ?>.csv');
+                this.exportExcel(this);
             }
         }
     ],

@@ -2,7 +2,7 @@
 class Index_Controller extends Base_Controller
 {
 	public function testAction() {
-		$this->error(404);
+		Error(404);
 	}
 
 	public function indexAction() {
@@ -43,7 +43,6 @@ class Index_Controller extends Base_Controller
 
 		$data = [
 			'page'		=> 'pages/index.php',
-			'page_id'	=> 'index_page',
 			'page_title'=> 'Welcome to HRsystem application',
 
 			'info_box' => [

@@ -10,7 +10,7 @@ class Error_Controller extends Base_Controller
 		$_GET['c'] = '404 Error Page';
 		$_GET['a'] = '';
 
-		$this->view->load('main', $data);
+		$this->view->Load('main', $data);
 	}
 
 	public function e500Action() {
@@ -22,6 +22,6 @@ class Error_Controller extends Base_Controller
 		$_GET['c'] = '500 Error Page';
 		$_GET['a'] = '';
 
-		$this->view->load('main', $data);
+		$this->view->Load('main', $data);
 	}
 }

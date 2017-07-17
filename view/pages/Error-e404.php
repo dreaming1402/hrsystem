@@ -9,7 +9,7 @@
             </h3>
             <p>
                 We could not find the page you were looking for.
-Meanwhile, you may <?php the_homepage('return to dashboard', false); ?>
+Meanwhile, you may <?php TheHomePage('return to dashboard', false); ?>
                 or try using the search form.
 
             </p>

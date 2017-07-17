@@ -1,16 +1,16 @@
-<?php
+<?php // File tiêu chuẩn
 class File_Controller extends Base_Controller
 {
     public function __construct()
     {
         parent::__construct();
         if (!isset($_GET['t']))
-            $this->error(500);
+            Error(500);
     }
 
     public function uploadAction() { // done
         if ($this->method != 'POST')
-            $this->error(503);
+            Error(503);
 
         // Define
         $data = [
@@ -22,7 +22,7 @@ class File_Controller extends Base_Controller
         ];
 
         if (isset($_FILES['file'])) {
-            $this->library->load('Uploader');
+            $this->library->Load('Uploader');
 
             $file_name = $_FILES['file']['name'];
             if ($_POST['rename'] != 'false')
@@ -31,6 +31,8 @@ class File_Controller extends Base_Controller
             $des_file = UPLOAD_DIR.'/'.$_GET['t'].'/'.$file_name;
 
             $upload_flag = $this->library->Uploader->UploadFile($_FILES['file'], $des_file, $_POST['overwrite'] == 'true');
+            if (strtolower($_GET['t']) == 'employeeimage')
+                $this->uploadEmployeeImage($file_name);
 
             if ($upload_flag == -2) {
                 $data = [
@@ -59,295 +61,12 @@ class File_Controller extends Base_Controller
             }
         }
 
-        //mod for project
-        if ($data['response']['success']) {
-            $this->model->load('API');
-            $this->library->load('PHPExcel');
-            $this->model->load('ExcelDatabase');
-
-            switch (strtolower($_GET['t'])) {
-                case 'employeedatabase':
-                    $sql_data_fields = [
-                        'db_maternity' => [
-                            'maternity_id'  => 'Emp ID',
-                            'maternity_type'=> 'Maternity',
-                            'maternity_begin'=> 'Start Date',
-                            'maternity_end' => 'End Date',
-                            'maternity_description'   => '',
-                            'maternity_trash_flag'   => '',
-                        ],
-                        'db_health' => [
-                            'health_id'     => 'Health No',
-                            'health_place'  => 'Health Place',
-                            'health_date'   => 'Health Date',
-                            'health_flag'   => 'Health Flag',
-                            'health_description'    => '',
-                            'health_trash_flag'   => '',
-                        ],
-                        'db_social' => [
-                            'social_id'     => 'Social No',
-                            'social_place'  => 'Social Place',
-                            'social_date'   => 'Social Date',
-                            'social_flag'   => 'Social Flag',
-                            'social_description'=> '',
-                            'social_trash_flag' => '',
-                        ],
-                        'db_contract' => [
-                            'contract_id'   => 'Contract No',
-                            'contract_type' => 'Contract Type',
-                            'contract_basic_salary' => 'Basic Salary',
-                            'contract_responsibitity_salary'    => 'Responsibitity Allowance',
-                            'contract_insurance_salary' => 'Insurance Salary',
-                            'contract_begin'    => 'Begin Contract',
-                            'contract_end'  => 'End Contract',
-                            'contract_description'  => '',
-                            'contract_trash_flag'   => ''
-                        ],
-                        'db_employee' => [
-                            'department'    => 'Department',
-                            'employee_id'   => 'Emp ID',
-                            'employee_old_id' => 'Old ID',
-                            'full_name'     => 'Full Name',
-                            'birth_date'    => 'Birth Date',
-                            'birth_place'   => 'Birth Place',
-                            'join_date'     => 'Join Date',
-                            'job'           => 'Job',
-                            'position'      => 'Position',
-                            'phone'         => 'Phone',
-                            'permanent_address' => 'Permanent Address',
-                            'present_address'   => 'Present Address',
-                            'gender'        => 'Sex',
-                            'person_id'     => 'Person ID',
-                            'person_issued_date'   => 'Issued Date',
-                            'person_place'  => 'Person Place',
-                            'ethenic'       => 'Ethenic',
-                            'education'     => 'Education',
-                            'employee_type' => 'Employee Type',
-                            'working_status'=> 'Status',
-                            'left_date'     => 'Left Date',
-                            'account'       => 'Account',
-                            'pit_id'        => 'PIT No',
-                            'email'         => 'Email',
-                            'office_phone'  => 'Office Phone',
-                            'contract_id'   => 'Contract No',
-                            'social_id'     => 'Social No',
-                            'health_id'     => 'Health No',
-                            'employee_trash_flag'   => '',
-                        ],
-                    ];
-
-                    $this->model->ExcelDatabase->connect($data['response']['data']['file']);
-                    $excelDatabase = $this->model->ExcelDatabase->select();
-
-                    // checking excel data
-                    $data_ok = true;
-                    $excel_data_fields = [];
-                    foreach ($sql_data_fields as $table_name => $table_fields) {
-                        foreach ($table_fields as $sql_field => $excel_field) {
-                            $field_keys = array_keys($excelDatabase['data_header'], $excel_field);
-                            if (!isset($field_keys[0]))
-                                $data_ok = false;
-                            else
-                                $excel_data_fields[$table_name][$sql_field] = $field_keys[0];
-                        }
-                    }
-
-                    $logs = [];
-                    if ($data_ok) {
-                        foreach ($excel_data_fields as $table_name => $table_fields) {
-                            $prefix = str_replace('db_', '', $table_name);
-                            $logs[$table_name] = [
-                                'update'    => [],
-                                'insert'    => [],
-                                'error'     => [],
-                            ];
-
-                            foreach ($excelDatabase['data'] as $row => $row_data) {
-                                $tmp = [];
-                                foreach ($table_fields as $key => $value) {
-                                    // sua loi dinh dang
-                                    if (strpos($key, '_date') !== false ||
-                                        strpos($key, '_begin') !== false ||
-                                        strpos($key, '_end') !== false) {// fix date format
-
-                                        //option2
-                                        $date = explode('/', $row_data[$value]);
-                                        if (sizeof($date) >= 3) {
-                                            // fix vietnamese input (dd/mm/yyyy) to SQL format (Y-m-d)
-                                            $date_format = $date[2].'/'.$date[1].'/'.$date[0];
-                                            $tmp[$key] = $date_format;
-                                        } else {
-                                            $tmp[$key] = null;
-                                        }
-                                    } else
-                                        $tmp[$key] = $row_data[$value];
-                                }
-
-                                if (isset($tmp[$prefix.'_id']) && ($tmp[$prefix.'_id'] != '' || $tmp[$prefix.'_id'] != null)) {
-                                    
-                                    //option1
-                                    $insert_flag = $this->model->API->new_row($table_name, $tmp);
-                                    if ($insert_flag) {
-                                        array_push($logs[$table_name]['insert'], $tmp);
-                                    } else {
-                                        $update_flag = $this->model->API->edit_row($table_name, $tmp, $prefix.'_id = \''.$tmp[$prefix.'_id'].'\'');
-                                        if ($update_flag > 0) {
-                                            array_push($logs[$table_name]['update'], $tmp);
-                                        } else {
-                                            array_push($logs[$table_name]['error'], $tmp);                                            
-                                        }
-                                    }
-
-                                    //option2
-                                   /* $insert_flag = json_decode($this->send('POST', 'http://localhost/pidn/hrsystem.php?c=employee&a=new', $tmp), true) ;
-
-                                    if ($insert_flag['success']) {
-                                        array_push($logs[$table_name]['insert'], $tmp);
-                                    } else {
-                                        $update_flag = json_decode($this->send('PUT', 'http://localhost/pidn/hrsystem.php?c=employee&a=edit', $tmp), true);
-                                        if ($update_flag['success']) {
-                                            array_push($logs[$table_name]['update'], $tmp);
-                                        } else {
-                                            array_push($logs[$table_name]['error'], $tmp);                                            
-                                        }
-                                    }*/
-                                }
-                            }
-                        }
-                        $data['response']['success'] = true;
-                        $data['response']['message'] = 'Đã hoàn tất update';
-                    } else {
-                        $data['response']['success'] = false;
-                        $data['response']['message'] = 'Dữ liệu không đúng';
-                    }
-
-                    $data['response']['data']['logs'] = $logs;
-                break;
-
-                case 'printdatabase':
-                    $sql_data_fields = [
-                        'db_print_card' => [
-                            'print_card_id' => 'Print ID',
-                            'print_date'    => 'Print Date',
-                            'print_description' => 'Description',
-                            'print_card_trash_flag' => '',
-
-                            'employee_department'    => 'Department',
-                            'employee_id'   => 'Emp ID',
-                            'employee_full_name'     => 'Full Name',
-                            'employee_position'      => 'Position',
-                            'employee_type' => 'Employee Type',
-                            'employee_contract_id'  => 'Contract No',
-
-                            'maternity_type'=> 'Maternity',
-                            'maternity_begin'=> 'Start Date',
-                            'maternity_end' => 'End Date',
-                        ],
-                    ];
-
-                    $this->model->ExcelDatabase->connect($data['response']['data']['file']);
-                    $excelDatabase = $this->model->ExcelDatabase->select();
-
-                    // checking excel data
-                    $data_ok = true;
-                    $excel_data_fields = [];
-                    foreach ($sql_data_fields as $table_name => $table_fields) {
-                        foreach ($table_fields as $sql_field => $excel_field) {
-                            $field_keys = array_keys($excelDatabase['data_header'], $excel_field);
-                            if (!isset($field_keys[0]))
-                                $data_ok = false;
-                            else
-                                $excel_data_fields[$table_name][$sql_field] = $field_keys[0];
-                        }
-                    }
-
-                    $logs = [];
-                    if ($data_ok) {
-                        foreach ($excel_data_fields as $table_name => $table_fields) {
-                            $prefix = str_replace('db_', '', $table_name);
-                            $logs[$table_name] = [
-                                'update'    => [],
-                                'insert'    => [],
-                                'error'     => [],
-                            ];
-
-                            foreach ($excelDatabase['data'] as $row => $row_data) {
-                                $tmp = [];
-                                foreach ($table_fields as $key => $value) {
-                                    // sua loi dinh dang
-                                    if (strpos($key, '_date') !== false ||
-                                        strpos($key, '_begin') !== false ||
-                                        strpos($key, '_end') !== false) {// fix date format
-
-                                        $date = explode('/', $row_data[$value]);
-
-                                        if (sizeof($date) >= 3) { //option 2
-                                            // fix vietnamese input (dd/mm/yyyy) to SQL format (Y-m-d)
-                                            $date_format = $date[2].'/'.$date[1].'/'.$date[0];
-                                            $tmp[$key] = $date_format;
-                                        } else {
-                                            $tmp[$key] = null;
-                                        }
-                                    } else
-                                        $tmp[$key] = $row_data[$value];
-                                }
-
-                                if (isset($tmp[$prefix.'_id']) && ($tmp[$prefix.'_id'] != '' || $tmp[$prefix.'_id'] != null)) {
-                                    
-                                    //option1
-                                    $insert_flag = $this->model->API->new_row($table_name, $tmp);
-                                    if ($insert_flag) {
-                                        array_push($logs[$table_name]['insert'], $tmp);
-                                    } else {
-                                        $update_flag = $this->model->API->edit_row($table_name, $tmp, $prefix.'_id = \''.$tmp[$prefix.'_id'].'\'');
-                                        if ($update_flag > 0) {
-                                            array_push($logs[$table_name]['update'], $tmp);
-                                        } else {
-                                            array_push($logs[$table_name]['error'], $tmp);                                            
-                                        }
-                                    }
-
-                                    //option2
-                                   /* $insert_flag = json_decode($this->send('POST', 'http://localhost/pidn/hrsystem.php?c=employee&a=new', $tmp), true) ;
-
-                                    if ($insert_flag['success']) {
-                                        array_push($logs[$table_name]['insert'], $tmp);
-                                    } else {
-                                        $update_flag = json_decode($this->send('PUT', 'http://localhost/pidn/hrsystem.php?c=employee&a=edit', $tmp), true);
-                                        if ($update_flag['success']) {
-                                            array_push($logs[$table_name]['update'], $tmp);
-                                        } else {
-                                            array_push($logs[$table_name]['error'], $tmp);                                            
-                                        }
-                                    }*/
-                                }
-                            }
-                        }
-                        $data['response']['success'] = true;
-                        $data['response']['message'] = 'Đã hoàn tất update';
-                    } else {
-                        $data['response']['success'] = false;
-                        $data['response']['message'] = 'Dữ liệu không đúng';
-                    }
-
-                    $data['response']['data']['logs'] = $logs;
-                break;
-
-                case 'employeeimage':
-                $compress_image = UPLOAD_DIR.'/'.$_GET['t'].'/compress/'.$_FILES['file']['name'];
-                if (file_exists($compress_image)) {
-                    unlink($compress_image);
-                }
-                break;
-            }
-        }
-
-        $this->view->load('json', $data);
+        $this->view->Load('json', $data);
     }
 
     public function deleteAction() { // done
         if ($this->method != 'DELETE')
-            $this->error(503);
+            Error(503);
 
         $data = [
             'response'  => [
@@ -358,15 +77,11 @@ class File_Controller extends Base_Controller
         ];
 
         if (isset($_GET['id'])&&isset($_GET['ext'])) {
-            $this->library->load('Uploader');
+            $this->library->Load('Uploader');
 
-            $des_file = UPLOAD_DIR.'/'.$_GET['t'].'/'.$_GET['id'].'.'.$_GET['ext'];
+            $file_name = $_GET['id'].'.'.$_GET['ext'];
+            $des_file = UPLOAD_DIR.'/'.$_GET['t'].'/'.$file_name;
             $delete_flag = $this->library->Uploader->DeleteFile($des_file);
-
-            if ($_GET['t'] == 'employeeImage') {
-                $compress_image = UPLOAD_DIR.'/'.$_GET['t'].'/compress/'.$_GET['id'].'.'.$_GET['ext'];
-                $this->library->Uploader->DeleteFile($compress_image);
-            }
 
             if ($delete_flag == -2) {
                 $data = [
@@ -392,15 +107,164 @@ class File_Controller extends Base_Controller
                         'data'      => $delete_flag,
                     ],
                 ];
+
+                switch (strtolower($_GET['t'])) {
+                    case 'employeeimage':
+                        $this->uploadEmployeeImage($file_name);
+                        break;
+                    
+                    default:
+                        # code...
+                        break;
+                }
             }            
         }
 
-        $this->view->load('json', $data);
+        $this->view->Load('json', $data);
     }
 
-    public function exportXlsxAction() {
-        if ($this->method != 'POST')
-            $this->error(404);
+    public function exportExcelAction() { // done
+        if ($this->method == 'POST') {
+            // Define
+            $data = [
+                'response'  => [
+                    'success'   => false,
+                    'message'   => 'Export failed',
+                    'data'      => [],
+                ],
+            ];
+
+            // Data mẫu
+            /*$data = [
+                'data'  => [
+                    ['16050095', 'Thái Minh Long'],
+                    ['16050096', 'Thái Minh Long2']
+                ],
+                'header' => [
+                    ['Date', date('Y-m-d')],
+                    ['Emp ID', 'Họ và tên'],
+                ],
+            ];*/
+
+            $data = $_POST;
+            $save_as_file = str_replace(' ', '', $_GET['t']).'.xlsx';
+
+            $this->library->Load('PHPExcel');
+            $export_flag = $this->library->PHPExcel->CreateFile($data, $save_as_file, false);
+
+            if ($export_flag == -1) {
+                $data['response']['success'] = false;
+                $data['response']['message'] = 'Không có dữ liệu để xuất';
+            } else {
+                $data['response']['success'] = true;
+                $data['response']['message'] = 'Đã xuất file thành công';
+                $data['response']['data'] = $export_flag;
+            }
+
+            $this->view->Load('json', $data);
+        } else {
+            // Nếu tồn tại tên file thì mới cho tải
+            if (isset($_GET['f'])) {
+                $file = $_GET['f'];
+                if (file_exists($file)) {
+                    // Download file
+                    /*header('Content-type: application/vnd.ms-excel');
+                    header('Content-Disposition: attachment; filename="'.$file.'"');*/
+
+                    header('Content-Description: File Transfer');
+                    header('Content-Type: application/octet-stream');
+                    header('Content-Disposition: attachment; filename='.$file);
+                    header('Content-Transfer-Encoding: binary');
+                    header('Expires: 0');
+                    header('Cache-Control: must-revalidate');
+                    header('Pragma: public');
+                    header('Content-Length: '.filesize($file));
+
+                    readfile($file);
+
+                    // Xóa file tránh dữ liệu quá nhiều
+                    unlink($file);
+                } else {
+                    Error(404);
+                }
+            } else {
+                Error(404);
+            }
+        }        
+    }
+
+    public function importExcelAction() { // done
+        $this->library->Load('PHPExcel');
+
+        // Define
+        $data = [
+            'response'  => [
+                'success'   => false,
+                'message'   => 'Read file failed',
+                'data'      => [],
+            ],
+        ];
+
+        $file = $_GET['f'];
+
+        $file_data = $this->library->PHPExcel->ReadFile($file, 2);
+
+        if ($file_data == -2) {
+            $data['response']['success'] = false;
+            $data['response']['message'] = 'File format incorrect';
+        } else if ($file_data == -1) {            
+            $data['response']['success'] = false;
+            $data['response']['message'] = 'File missing';
+        } else {
+            $data['response']['success'] = true;
+            $data['response']['message'] = 'Dữ liệu đã load xong';
+            $data['response']['data'] = $file_data;
+
+            $this->model->Load('API');
+            $table_name = strtolower($_GET['t']);
+            
+            if (!isset($file_data['header']))
+                $data['response']['message'] = 'Dữ liệu không đúng';
+            else {
+                $insert_logs = [];
+                foreach ($file_data['data'] as $row) {
+                    $insert_data = [];
+                    $response_data = [];
+                    foreach ($row as $index => $value) {
+                        $field_name = $file_data['header'][0][$index];
+                        $response_data[$field_name] = $value;
+                        // Sửa lỗi định dạng ngày tháng nếu có
+                        if (strpos($field_name, '_date') ||
+                            strpos($field_name, '_begin') ||
+                            strpos($field_name, '_end')) {
+                            if (is_numeric($value)) {
+                                // Format theo định dạng date của excel
+                                $value = date('Y-m-d H:i:s', ($value-25569)*86400);
+                            } else {
+                                // Format theo người dùng nhập dạng text
+                            }
+                        }
+
+                        // Bỏ qua nếu field = id (cột tự đếm)
+                        if ($field_name == 'id')
+                            continue;
+                        
+                        $insert_data[$field_name] = $value;
+                    }
+
+                    // Query và lưu kết quả vào response_data
+                    $insert_flag = $this->model->API->InsertRow($table_name, $insert_data);
+                    $response_data['insert_flag'] = !$insert_flag?false:true;
+
+                    array_push($insert_logs, $response_data);
+
+                    $data['response']['message'] = 'Import thành công';
+                    $data['response']['data'] = $insert_logs;
+                };
+            };
+        };
+
+        $this->view->Load('json', $data);
     }
 
     public function send($method, $server, $data) { // Hàm dùng để request API bằng php
@@ -422,5 +286,12 @@ class File_Controller extends Base_Controller
             $result = file_get_contents($server.http_build_query($data), false, $context);
         }
         return $result;
+    }
+
+    private function uploadEmployeeImage($_filename) {
+        $compress_image = UPLOAD_DIR.'/'.$_GET['t'].'/compress/'.$_filename;
+        if (file_exists($compress_image)) {
+            unlink($compress_image);
+        }
     }
 }

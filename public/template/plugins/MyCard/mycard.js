@@ -59,8 +59,8 @@ function MyCard(_options) {
         outputTemplate = '<p class="'+defaults.outputCls+'"></p>',
         viewerTemplate = '<div class="'+defaults.viewerCls+'"><p class="'+defaults.hintCls+'">Empty Card</p></div></div>',
         cardTemplate = '<div class="'+defaults.cardCls+'" id="[employee_id]">[employee_id]</div>',
-        cardControl = $('<div class="card-control overlay"><div class="centered"><i class="loading fa fa-refresh fa-spin text-blue"></i>'
-                        +'<div class="control"><span action="'+defaults.namespace+'.RemoveCard" role="remove" class="control-action text-red"><i class="fa fa-times"></i></span></div><!--control--></div><!--centered--></div><!--overlay-->'),
+        cardControl = '<div class="card-control overlay"><div class="centered"><i class="loading fa fa-refresh fa-spin text-blue"></i>'
+                        +'<div class="control"><span action="'+defaults.namespace+'.RemoveCard" role="remove" class="control-action text-red"><i class="fa fa-times"></i></span></div><!--control--></div><!--centered--></div>',
 
         myCard = $(defaults.renderTo),
         output = myCard.find('.'+defaults.outputCls),
@@ -73,6 +73,7 @@ function MyCard(_options) {
     // Note:
     // Các hàm đều giao tiếp bằng card_id
     // AddCard + CreateCard lấy object từ fancygrid
+    this.CardList = cardList;
 
     // Setup
     this.Run = function() {
@@ -119,7 +120,7 @@ function MyCard(_options) {
     this.AddCard = function(_obj, _template_name = 'default') {
         // Thêm vào cardList
         var card = me.CreateCard(_obj, _template_name),
-            //card_id = cardList.push(card) - 1;
+            // card_id = cardList.push(card) - 1;
             card_id = _obj.employee_id;
 
         // Thêm id cho card
@@ -239,8 +240,7 @@ function MyCard(_options) {
         var card = viewer.find('.'+defaults.cardCls+'#'+_card_id),
             card_outer = card.parent(),
             canvas = document.createElement('canvas'),
-            context = canvas.getContext('2d'),
-            MC = this;
+            context = canvas.getContext('2d');
 
         if (!card.length) {
             // Hiện thông báo
@@ -272,7 +272,7 @@ function MyCard(_options) {
 
             // Tự động download
             if (_auto_download)
-                MC.DownloadCard(_card_id);
+                me.DownloadCard(_card_id);
         }, function error(e) {
             // Đánh dấu tạo ảnh không thành công
             card_outer.attr('class', defaults.cardCls+'-container error');
@@ -302,7 +302,7 @@ function MyCard(_options) {
 
         if (!card_outers.length) {
             if (_auto_download)
-                me.zipAll();
+                me.ZipAll();
 
             return;
         };
@@ -311,8 +311,7 @@ function MyCard(_options) {
             card_outer = card.parent(),
             card_id = card.attr('id'),
             canvas = document.createElement('canvas'),
-            context = canvas.getContext('2d'),
-            MC = this;
+            context = canvas.getContext('2d');
 
         if (!card.length) {
             error('Không tìm thấy card('+card_id+')');
@@ -343,7 +342,7 @@ function MyCard(_options) {
             error('Rending completed: '+renderCount+'/'+cardList.length);
 
             // Next
-            MC.CreateImageAll(false, _auto_download);
+            me.CreateImageAll(false, _auto_download);
         }, function error(e) {
             // Đánh dấu tạo ảnh không thành công
             card_outer.attr('class', defaults.cardCls+'-container error');
@@ -397,7 +396,7 @@ function MyCard(_options) {
     };
 
     // Hàm add tất cả ảnh vào 1 file
-    function zipAll() {
+    this.ZipAll = function() {
         var renders = viewer.find('canvas.'+defaults.cardCls+'-render');
 
         // Kiểm tra xem có ảnh hay không
@@ -473,7 +472,7 @@ function MyCard(_options) {
     // Error handler
     function error(_message, _show_alert = false) { // done
         if (_show_alert) alert(_message);
-        if (debug) console.log('[Upload Error] - ' + _message);
+        if (debug) console.log('[MyCard Error] - ' + _message);
         output.text(_message);
     };
 };
