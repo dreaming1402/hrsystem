@@ -1,8 +1,7 @@
 <?php // File tiêu chuẩn
 class File_Controller extends Base_Controller
 {
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
         if (!isset($_GET['t']))
             Error(500);
