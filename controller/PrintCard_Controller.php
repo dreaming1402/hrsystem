@@ -295,7 +295,7 @@ class PrintCard_Controller extends Base_Controller
 						],
 		        	],
 		        	[ // employee_id
-						'type'	=> 'number',
+						'type'	=> 'string',
 		        		'index'	=> 'employee_id',
 						'title'	=> 'Mã NV',
 						'width'	=> 70,
@@ -690,7 +690,7 @@ class PrintCard_Controller extends Base_Controller
 						],
 		        	],
 		        	[ // employee_id
-						'type'	=> 'number',
+						'type'	=> 'string',
 		        		'index'	=> 'employee_id',
 						'title'	=> 'Mã NV',
 						'width'	=> 70,
@@ -875,7 +875,7 @@ class PrintCard_Controller extends Base_Controller
 						],
 		        	],
 		        	[ // employee_id
-						'type'	=> 'number',
+						'type'	=> 'string',
 		        		'index'	=> 'employee_id',
 						'title'	=> 'Mã NV',
 						'width'	=> 70,
@@ -1272,7 +1272,7 @@ class PrintCard_Controller extends Base_Controller
 						],
 		        	],
 		        	[ // employee_id
-						'type'	=> 'number',
+						'type'	=> 'string',
 		        		'index'	=> 'employee_id',
 						'title'	=> 'Mã NV',
 						'width'	=> 70,
@@ -1306,6 +1306,11 @@ class PrintCard_Controller extends Base_Controller
 								'url'	=> '?c=PrintCard&a=getPrintData&i=employee_type',
 							],
 						],
+					],					
+					[ // contract_id
+						'type'	=> 'string',
+						'index'	=> 'contract_id',
+						'title'	=> 'Mã hợp đồng',
 					],
 	        		[ // contract_type
 						'type'	=> 'combo',
