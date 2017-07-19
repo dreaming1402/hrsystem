@@ -49,7 +49,7 @@ if (isset($_GET['pregnancy'])) {
 	<?php echo $layer_unlimit; ?>
 	<?php echo $layer_datelimit; ?>
 	<style type="text/css">
-		<?php echo get_template('mycard', ['html'], 'mycard'); ?>
-		<?php echo get_template('mycard', ['html'], 'mycard-employee'); ?>
+		<?php ApplyScript('mycard', 'html'); ?>
+		<?php ApplyScript('mycard-employee', 'html'); ?>
 	</style>
 </div>

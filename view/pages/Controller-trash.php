@@ -13,59 +13,70 @@
 
 <script>
 Fancy.defineController('controller_<?php echo $page_id; ?>', {
-	onSelect: function(grid) {
-		var selection = grid.getSelection(),
-		restoreButton = grid.tbar[1];
-		permanentlyDeleteButton = grid.tbar[2];
+	onSelect: function(_grid) {
+		var selection = _grid.getSelection(),
+		restoreFromTrashButton = _grid.tbar[1];
+		permanentlyDeleteButton = _grid.tbar[2];
 
 		if (selection.length >= 1) {
-			restoreButton.enable();
+			restoreFromTrashButton.enable();
 			permanentlyDeleteButton.enable();
 		} else {
-			restoreButton.disable();
+			restoreFromTrashButton.disable();
 			permanentlyDeleteButton.disable();
 		}
 	},
-	onClearSelect: function(grid) {
-		grid.tbar[1].disable();
-		grid.tbar[2].disable();
+	onClearSelect: function(_grid) {
+		_grid.tbar[1].disable();
+		_grid.tbar[2].disable();
 	},
-	restoreFromTrash: function(item) {
+	restoreFromTrash: function(_item) {
 		new $.ajax({
-        	url: '?c=<?php echo $controller; ?>&a=restoreFromTrash&id='+item.id,
+        	url: '?c=<?php echo $controller; ?>&a=restore&id='+_item.id,
         	method: 'PUT',
 			success: function(data) {
 	            if (data.success) {
 	                $('#alert-area').html('<div class="alert alert-success alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.message+'</div>');
-					grid_<?php echo $page_id; ?>.remove(item.id);
+					grid_<?php echo $page_id; ?>.remove(_item.id);
 	            } else {
 	                $('#alert-area').html('<div class="alert alert-warning alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.message+'</div>');
 	            }
 			},
 		});
 	},
-	permanentlyDelete: function(item) {
+	permanentlyDelete: function(_item) {
 		new $.ajax({
-        	url: '?c=<?php echo $controller; ?>&a=permanentlyDelete&id='+item.id,
+        	url: '?c=<?php echo $controller; ?>&a=delete&id='+_item.id,
         	method: 'DELETE',
 			success: function(data) {
 	            if (data.success) {
 	                $('#alert-area').html('<div class="alert alert-success alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.message+'</div>');
-					grid_<?php echo $page_id; ?>.remove(item.id);
+					grid_<?php echo $page_id; ?>.remove(_item.id);
 	            } else {
 	                $('#alert-area').html('<div class="alert alert-warning alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.message+'</div>');
 	            }
 			},
 		});
 	},
-    exportExcel: function(grid) {
-        var rows = grid.getDataView(),
+    exportExcel: function(_grid) {
+        var rows = _grid.store.filteredData || _grid.getData(),
             col_names = [];
 
         if (rows.length) {
-            $.each(rows[0], function(key, value) {
-                col_names.push(key);
-            });
+            if (_grid.store.filteredData) {
+                $.each(rows[0].data, function(key, value) {
+                    col_names.push(key);
+                });
+                var tmp = [];
+                $.each(rows, function(key, value) {
+                    tmp.push(value.data);
+                });
+                rows = tmp;
+            } else {                
+                $.each(rows[0], function(key, value) {
+                    col_names.push(key);
+                });
+            }
         };
 
         new $.ajax({

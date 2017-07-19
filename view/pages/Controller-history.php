@@ -13,9 +13,9 @@
 
 <script>
 Fancy.defineController('controller_<?php echo $page_id; ?>', {
-    onSelect: function(grid) {
-        var selection = grid.getSelection(),
-        moveToTrashButton = grid.tbar[1];
+    onSelect: function(_grid) {
+        var selection = _grid.getSelection(),
+        moveToTrashButton = _grid.tbar[1];
 
         if (selection.length >= 1) {
             moveToTrashButton.enable();
@@ -23,31 +23,42 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
             moveToTrashButton.disable();
         }
     },
-    onClearSelect: function(grid) {
-        grid.tbar[1].disable();
+    onClearSelect: function(_grid) {
+        _grid.tbar[1].disable();
     },
-    moveToTrash: function(item) {
+    moveToTrash: function(_item) {
         new $.ajax({
-            url: '?c=<?php echo $controller; ?>&a=moveToTrash&id='+item.id,
+            url: '?c=<?php echo $controller; ?>&a=remove&id='+_item.id,
             method: 'PUT',
             success: function(data) {
                 if (data.success) {
                     $('#alert-area').html('<div class="alert alert-success alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.message+'</div>');
-                    grid_<?php echo $page_id; ?>.remove(item.id);
+                    grid_<?php echo $page_id; ?>.remove(_item.id);
                 } else {
                     $('#alert-area').html('<div class="alert alert-warning alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.message+'</div>');
                 }
             },
         });
     },
-    exportExcel: function(grid) {
-        var rows = grid.getDataView(),
+    exportExcel: function(_grid) {
+        var rows = _grid.store.filteredData || _grid.getData(),
             col_names = [];
 
         if (rows.length) {
-            $.each(rows[0], function(key, value) {
-                col_names.push(key);
-            });
+            if (_grid.store.filteredData) {
+                $.each(rows[0].data, function(key, value) {
+                    col_names.push(key);
+                });
+                var tmp = [];
+                $.each(rows, function(key, value) {
+                    tmp.push(value.data);
+                });
+                rows = tmp;
+            } else {                
+                $.each(rows[0], function(key, value) {
+                    col_names.push(key);
+                });
+            }
         };
 
         new $.ajax({

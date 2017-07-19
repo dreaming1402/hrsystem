@@ -20,7 +20,7 @@
                     </li>
 
                     <li>
-                        <a href="?c=Employee&a=PrintCard">
+                        <a href="?c=PrintCard&a=index">
                             <i class="fa fa-print"></i>
                             In thẻ nhân viên
                         </a>
@@ -30,43 +30,6 @@
                         <a href="?c=PrintCard&a=history">
                             <i class="fa fa-history"></i>
                             Lịch sử in thẻ
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="?c=PrintCard&a=trash">
-                            <i class="fa fa-trash"></i>
-                            Thùng rác
-                        </a>
-                    </li>
-                    
-                </ul>
-            </li>
-
-            <li class="treeview">
-                <a href="#">
-                    <i class="fa fa-star"></i>
-                    <span>Công nhân xuất sắc</span>
-                </a>
-                <ul class="treeview-menu">
-                    <li>
-                        <a href="?c=Employee&a=uploadImage">
-                            <i class="fa fa-upload"></i>
-                            Tải lên hình công nhân
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="?c=Employee&a=PrintCard">
-                            <i class="fa fa-print"></i>
-                            In nhân viên xuất sắc
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="?c=PrintCard&a=history">
-                            <i class="fa fa-history"></i>
-                            Lịch sử in
                         </a>
                     </li>
 

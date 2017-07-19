@@ -6,6 +6,9 @@ return [
 	'DB_PASSWORD'	=> '',
 	'DB_TABLE'		=> 'hrsystem',
 	'DB_PREFIX'		=> 'prefix_',
+	'DB_DATE_FORMAT'=> 'Y-m-d H:i:s',
+	//'DB_DATE_FORMAT'=> 'Y-m-d',
+	'DB_CHARSET'	=> 'utf8',
 
 	'DEBUG_ENABLE'	=> true,
 
