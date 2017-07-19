@@ -211,6 +211,12 @@ function FormatBytes(_bytes, _decimals = 0) {
   return parseFloat((_bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
+// Định dạng của vn = ngày/tháng/năm
+function FormatDateVnToEn(_dateString) {
+  var date = _dateString.split('-');// date = 0, month = 1, year = 2
+  return date[2]+'-'+date[1]+'-'+date[0];
+}
+
 // Định dạng ngày Y-m-d H:M:s thành int
 function FormatDate(_dateString) {
   var date = new Date(_dateString);

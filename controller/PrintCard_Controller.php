@@ -6,8 +6,15 @@ class PrintCard_Controller extends Base_Controller
 	public function indexAction() { // done
     	if ($this->method == 'POST') { // Lưu ảnh đã in
 			$this->model->Load('API');
+
+			// Sửa lỗi định dạng ngày tháng nếu có
+            $_POST['maternity_begin'] = FormatDateToSql($_POST['maternity_begin']);
+            $_POST['maternity_end'] = FormatDateToSql($_POST['maternity_end']);
+
 			$_POST[$this->tableName.'_create_date'] = date(DB_DATE_FORMAT);
 			$_POST[$this->tableName.'_create_by'] = $this->uid;
+
+
     		$query = $this->model->API->InsertRow($this->tableName, $_POST);
 			$data = [
 				'response' => [

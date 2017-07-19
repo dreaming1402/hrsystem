@@ -236,13 +236,7 @@ class File_Controller extends Base_Controller
                         if (strpos($field_name, '_date') ||
                             strpos($field_name, '_begin') ||
                             strpos($field_name, '_end')) {
-                            if (is_numeric($value)) {
-                                // Format theo định dạng date của excel
-                                $value = date(DB_DATE_FORMAT, ($value-25569)*86400);
-                            } else if (is_null($value) || $value == '') {
-                                // Format theo người dùng nhập dạng text
-                                $value = '0000-00-00 00:00:00';
-                            }
+                            $value = FormatDateToSql($value);
                         }
 
                         $response_data[$field_name] = $value;
