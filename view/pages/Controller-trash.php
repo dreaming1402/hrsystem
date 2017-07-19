@@ -143,10 +143,17 @@ var grid_<?php echo $page_id; ?> = new FancyGrid({
 				})
 			}
 		},
+		{
+            text: 'Xóa bộ lọc',
+            handler: function(){
+                this.clearFilter();
+            }
+        },
         {
             text: 'Tải lại bảng',
             tip: 'Refresh',
             handler: function(){
+                this.clearFilter();
                 this.load();
             }
         },
