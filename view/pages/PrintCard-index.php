@@ -160,7 +160,7 @@ Fancy.defineController('controller_<?php echo $page_id; ?>', {
                                     SubmitForm(item[0].data, print_form, db_print_card_name, db_print_card_desc);
                             });
 
-                            //this.hide();
+                            this.hide();
 
                             $('#alert-area').html('<div class="alert alert-success alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Đã tải về thành công</div>');
                         }
