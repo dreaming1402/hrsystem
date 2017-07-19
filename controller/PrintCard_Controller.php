@@ -501,7 +501,7 @@ class PrintCard_Controller extends Base_Controller
 	private function getPrintList($_where, $_trash = false) { // done
 		$this->model->Load('API');
 
-		$data_file = 'http://localhost:81/data.json';
+		$data_file = 'http://127.0.0.1:81/pidn/hrsystemdata.json';
 		// báo lỗi không tìm thấy dữ liệu
 		if (!UrlExists($data_file))
 			die('Không tìm thấy CSDL');
