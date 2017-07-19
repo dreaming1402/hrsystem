@@ -231,18 +231,21 @@ class File_Controller extends Base_Controller
                     $response_data = [];
                     foreach ($row as $index => $value) {
                         $field_name = $file_data['header'][0][$index];
-                        $response_data[$field_name] = $value;
+
                         // Sửa lỗi định dạng ngày tháng nếu có
                         if (strpos($field_name, '_date') ||
                             strpos($field_name, '_begin') ||
                             strpos($field_name, '_end')) {
                             if (is_numeric($value)) {
                                 // Format theo định dạng date của excel
-                                $value = date('Y-m-d H:i:s', ($value-25569)*86400);
-                            } else {
+                                $value = date(DB_DATE_FORMAT, ($value-25569)*86400);
+                            } else if (is_null($value) || $value == '') {
                                 // Format theo người dùng nhập dạng text
+                                $value = '0000-00-00 00:00:00';
                             }
                         }
+
+                        $response_data[$field_name] = $value;
 
                         // Bỏ qua nếu field = id (cột tự đếm)
                         if ($field_name == 'id')
