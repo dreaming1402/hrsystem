@@ -5,7 +5,7 @@
 		<title><?php echo $page_title . ' - ' . APP_NAME; ?></title>
 
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-<?php ApplyScript(); ?>
+        <?php ApplyScript(); ?>
 	</head>
 	<body id="<?php echo $page_id; ?>" class="sidebar-mini skin-green sidebar-collapse">
 		<div class="wrapper">

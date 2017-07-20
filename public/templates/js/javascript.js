@@ -1,4 +1,5 @@
-$(document).ready(function() {
+// IE ko sử dụng được func(_in = 'define') {};
+
 // Helper
 
 // Hỗ trợ replace tất cả text có trong chuỗi
@@ -8,7 +9,7 @@ String.prototype.ReplaceAll = function(search, replacement) { var target = this;
 function TrToArray(_tr) { var result = []; $(_tr).find('td').each(function() { result.push($(this).html()); }); return result; }
 
 // Hiển tị tin nhắn và console log
-function ShowMessage(_message, _showAlert = true) { console.log(_message); if(_showAlert) alert(_message); }
+function ShowMessage(_message, _show_alert) { _show_alert = _show_alert || true; console.log(_message); if(_show_alert) alert(_message); }
 
 // Lấy thông tin file
 function GetFileName(_file_path) { return _file_path.split('\\').pop().split('/').pop(); }
@@ -76,7 +77,10 @@ function PhoneInputFn(_value) {
 }
 
 // Định dạng tiền
-function SalaryInputFn(_value, _currency = '$') {
+function SalaryInputFn(_value, _currency) {
+  // Define
+  _currency = _currency || '$';
+
   // Loại bỏ các ký tự đặc biệt
   _value = _value.toString().replace(_currency, '').replace(/\,/g, '').replace('-', '').replace('.', '');
 
@@ -203,7 +207,10 @@ var NumberTillFilterFn = function(field, value, oldValue){
 };
 
 // Định dạng bytes
-function FormatBytes(_bytes, _decimals = 0) {
+function FormatBytes(_bytes, _decimals) {
+  // Define
+  _decimals = _decimals || 0;
+
   if(_bytes == 0) return '0 Byte';
   var k = 1000,
       dm = _decimals + 1 || 3,
@@ -236,70 +243,6 @@ function GetLinkContent(_link) {
   return response;
 }
 
-function upload_file(_form, _callback = null) {
-  var server = _form.attr('action'),
-      files = _form.find('input:file')[0].files;
-  if (!files.length)
-    return false;
-
-  var processing = _form.find('.processing'),
-      formData = new FormData();
-  formData.append('file', files[0]);
- 
-  var ajax = $.ajax({
-      url: server,
-      method: 'POST',
-      data: formData,
-      cache: false,
-      contentType: false,
-      processData: false,
-      beforeSend: function(jqXHR, settings) {
-        if (processing.length)
-          _form.append('<i class="processing fa fa-refresh fa-spin"></i>');
-        else
-          _form.find('.processing').removeClass('hidden');
-      },
-      success: function(data, textStatus, jqXHR) {
-        if (_callback != null)
-          window[_callback](data);
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-          console.log(errorThrown);
-      },
-      complete: function(jqXHR, textStatus) {
-        _form.find('.processing').addClass('hidden');
-        console.log({action:'upload_file: '+server, file: files[0].name, status: textStatus});
-      }
-  });
-}
-function delete_file(_server, _file, _callback = null) {
-  $.ajax({
-      url: _server,
-      method: 'POST',
-      data: {id:'"'+_file+'"'},
-      cache: false,
-      contentType: false,
-      processData: false,
-      beforeSend: function(jqXHR, settings) {
-        $('.processing').attr('class', 'processing fa fa-refresh fa-spin');
-      },
-      success: function(data, textStatus, jqXHR) {
-        if (_callback != null)
-          window[_callback](data);
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        $('.message').attr('class', 'message text-red');
-        $('.message i').attr('class', 'icon fa fa-ban');
-        $('.message span').html(errorThrown);
-        console.log('Error: ' + errorThrown)
-      },
-      complete: function(jqXHR, textStatus) {
-        $('.processing').attr('class', 'hidden');
-        console.log('Complete: ' + textStatus);
-      }
-  });
-}
-
 // Tạo file CSV từ Fancygrid
 function FancygridToCsv(_gridId, _fileName) {
   var header_length = $(_gridId).find('.fancy-grid-header-cell-text').length,
@@ -330,8 +273,10 @@ function FancygridToCsv(_gridId, _fileName) {
   //$('#down').attr('href', CreateTextFile(tmp.join('\n')));
 
   CreateTextFile(tmp.join('\n'), true)
+  function CreateTextFile(_text, _auto_download) {
+    // Define
+    _auto_download = _auto_download || false;
 
-  function CreateTextFile(_text, _autoDownload = false) {
     var text_file = null,
         data = new Blob([_text], {type: 'text/csv;charset=utf-8;'});
 
@@ -343,7 +288,7 @@ function FancygridToCsv(_gridId, _fileName) {
 
     text_file = window.URL.createObjectURL(data);
 
-    if (_autoDownload)
+    if (_auto_download)
       saveAs(data, _fileName);
 
     return text_file;
@@ -401,7 +346,9 @@ function FancygridToCsv(_gridId, _fileName) {
 };*/
 
 // Hàm gọi event bằng function name
-function CallFunctionByName(_function_name, _context, _args = []) {
+function CallFunctionByName(_function_name, _context, _args) {
+  _args = _args || [];
+
   var args = _args.slice.call(arguments).splice(2),
       namespaces = _function_name.split("."),
       function_name = namespaces.pop(), // function name là cái cuối cùng của chuỗi
@@ -435,10 +382,3 @@ $(document).ready(function() {
       CallFunctionByName(action, window, data);
   })
 })
-
-
-
-
-
-//document.ready()
-});

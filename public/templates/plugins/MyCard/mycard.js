@@ -117,7 +117,10 @@ function MyCard(_options) {
     this.Run();
 
     // Thêm Card mới bằng Obj vào danh sách
-    this.AddCard = function(_obj, _template_name = 'default') {
+    this.AddCard = function(_obj, _template_name) {
+        // Define
+        _template_name = _template_name || 'default';
+
         // Thêm vào cardList
         var card = me.CreateCard(_obj, _template_name),
             // card_id = cardList.push(card) - 1;
@@ -207,7 +210,10 @@ function MyCard(_options) {
     // Tạo card theo cardTemplate
     // Tự động thay thế các field = value
     // Ex: [employee_id] thay bằng 16050095
-    this.CreateCard = function(_obj, _template_name = 'default') {
+    this.CreateCard = function(_obj, _template_name) {
+        // Define
+        _template_name = _template_name || 'default';
+
         var card = '<div class="'+defaults.cardCls+'-container">'+defaults.cardTemplates[_template_name]+'</div>';
 
         if (!defaults.fields) {
@@ -236,7 +242,10 @@ function MyCard(_options) {
     };
 
     // Tạo ảnh từ card_id
-    this.CreateImage = function(_card_id, _auto_download = false) {
+    this.CreateImage = function(_card_id, _auto_download) {
+        // Define
+        _auto_download = _auto_download || false;
+
         var card = viewer.find('.'+defaults.cardCls+'#'+_card_id),
             card_outer = card.parent(),
             canvas = document.createElement('canvas'),
@@ -290,7 +299,11 @@ function MyCard(_options) {
     };
 
     // Tạo nhiều ảnh
-    this.CreateImageAll = function(_clear_before = true, _auto_download = false) {
+    this.CreateImageAll = function(_clear_before, _auto_download) {
+        // Define
+        _clear_before = _clear_before || true;
+        _auto_download = _auto_download || false;
+
         if (_clear_before) { // đặt class trở về mặc định
             renderCount = 0;
             zipCount = 0;
@@ -470,7 +483,10 @@ function MyCard(_options) {
     };
 
     // Error handler
-    function error(_message, _show_alert = false) { // done
+    function error(_message, _show_alert) { // done
+        // Define
+        _show_alert = _show_alert || false;
+
         if (_show_alert) alert(_message);
         if (debug) console.log('[MyCard Error] - ' + _message);
         output.text(_message);

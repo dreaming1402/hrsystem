@@ -20,19 +20,21 @@
 
 </div><!--row-->
 <script>
-var uploader_<?php echo $page_id; ?> = new Uploader({
-    renderTo: '#uploader_<?php echo $page_id; ?>',
-    debug: true,
-    autoUpload: true,
-    multiFile: true,
-    overwrite: true,
-    maxSize: 5, //mb    
-    server: {
-        upload: '?c=File&a=upload&t=employeeImage',
-        delete: '?c=File&a=delete&t=employeeImage',
-    },
-    namespace: 'uploader_<?php echo $page_id; ?>',
-    hint: '<button action="uploader_<?php echo $page_id; ?>.Browers" class="control-action btn btn-default">Chọn</button> hoặc kéo thả ảnh (.png) vào đây',
-    extensions: ['png'],
+$(document).ready(function() {
+    var uploader_<?php echo $page_id; ?> = new Uploader({
+        renderTo: '#uploader_<?php echo $page_id; ?>',
+        debug: true,
+        autoUpload: true,
+        multiFile: true,
+        overwrite: true,
+        maxSize: 5, //mb    
+        server: {
+            upload: '?c=File&a=upload&t=employeeImage',
+            delete: '?c=File&a=delete&t=employeeImage',
+        },
+        namespace: 'uploader_<?php echo $page_id; ?>',
+        hint: '<button action="uploader_<?php echo $page_id; ?>.Browers" class="control-action btn btn-default">Chọn</button> hoặc kéo thả ảnh (.png) vào đây',
+        extensions: ['png'],
+    });
 });
 </script>
