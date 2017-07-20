@@ -29,7 +29,7 @@ if (!function_exists('SetupSite')) {
 		RegisterScript('adminlte', 'css', TEMPLATE_DIR . '/plugins/AdminLTE/dist/css/AdminLTE.min.css');
 		RegisterScript('adminlte-skin', 'css', TEMPLATE_DIR . '/plugins/AdminLTE/dist/css/skins/_all-skins.min.css');
 
-		RegisterScript('hrsystem', 'css', TEMPLATE_DIR . '/css/style.css');
-		RegisterScript('hrsystem', 'js', TEMPLATE_DIR . '/js/javascript.js');
+		RegisterScript(APP_PREFIX, 'css', TEMPLATE_DIR . '/css/style.css');
+		RegisterScript(APP_PREFIX, 'js', TEMPLATE_DIR . '/js/javascript.js');
 	}; SetupSite();
 }

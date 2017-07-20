@@ -3,6 +3,5 @@
 				<strong>Copyright © 2016 <a href="#">Long Thai</a>.</strong> All rights reserved.
 			</footer>
 		</div><!--wrapper-->
-		<?php ApplyScript('hrsystem', 'js'); ?>
 	</body>
 </html>
