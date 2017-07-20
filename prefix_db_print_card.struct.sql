@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 19, 2017 at 05:47 AM
+-- Generation Time: Jul 19, 2017 at 06:02 PM
 -- Server version: 10.1.19-MariaDB
 -- PHP Version: 7.0.13
 
@@ -32,7 +32,7 @@ CREATE TABLE `prefix_db_action` (
   `db_action_by` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `db_action_type` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `db_action_success` tinyint(1) NOT NULL DEFAULT '0',
-  `db_action_content` varchar(2048) COLLATE utf8_unicode_ci NOT NULL
+  `db_action_content` longtext COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -92,12 +92,12 @@ ALTER TABLE `prefix_db_print_card`
 -- AUTO_INCREMENT for table `prefix_db_action`
 --
 ALTER TABLE `prefix_db_action`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=691;
 --
 -- AUTO_INCREMENT for table `prefix_db_print_card`
 --
 ALTER TABLE `prefix_db_print_card`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

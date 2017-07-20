@@ -509,6 +509,7 @@ class PrintCard_Controller extends Base_Controller
 		$this->model->Load('API');
 
 		$data_file = 'http://127.0.0.1:81/pidn/hrsystemdata.json';
+		//$data_file = 'http://pidanang/pidn/reports/ch/ae/rpt_employee_detail_list_pidn_.aspx?p1=ALL&p2=01&p3=2&p4=&p5=&p6=&p7=ALL&p8=ALL&p9=ALL&p10=ALL&p11=&p12=&p13=ALL&p14=ALL&p15=ALL&p16=&p17=&p18=&p19=ALL&p20=&p21=ALL&p_user=itlong&p22=N&p23=ALL&p24=ALL&p25=ALL&p26=ALL&p27=ALL';
 		// báo lỗi không tìm thấy dữ liệu
 		if (!UrlExists($data_file))
 			die('Không tìm thấy CSDL');

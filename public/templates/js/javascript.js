@@ -1,3 +1,4 @@
+$(document).ready(function() {
 // Helper
 
 // Hỗ trợ replace tất cả text có trong chuỗi
@@ -434,3 +435,10 @@ $(document).ready(function() {
       CallFunctionByName(action, window, data);
   })
 })
+
+
+
+
+
+//document.ready()
+});
