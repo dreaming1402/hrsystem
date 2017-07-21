@@ -301,7 +301,7 @@ function MyCard(_options) {
     // Tạo nhiều ảnh
     this.CreateImageAll = function(_clear_before, _auto_download) {
         // Define
-        _clear_before = _clear_before || true;
+        _clear_before = _clear_before || false;
         _auto_download = _auto_download || false;
 
         if (_clear_before) { // đặt class trở về mặc định
