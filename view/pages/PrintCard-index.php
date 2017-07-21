@@ -382,8 +382,8 @@ var grid_<?php echo $page_id; ?> = new FancyGrid({
             text: 'Tải lại bảng',
             tip: 'Refresh',
             handler: function(){
-                //this.clearFilter();
-                //this.load();
+                this.clearFilter();
+                this.load();
             }
         },
         {
