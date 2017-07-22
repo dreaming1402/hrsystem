@@ -4,7 +4,7 @@ return [
 	'DB_HOST'		=> 'localhost',
 	'DB_USER'		=> 'root',
 	'DB_PASSWORD'	=> '',
-	'DB_TABLE'		=> 'hrsystem',
+	'DB_NAME'		=> 'hrsystem',
 	'DB_PREFIX'		=> 'prefix_',
 	'DB_DATE_FORMAT'=> 'Y-m-d H:i:s',
 	//'DB_DATE_FORMAT'=> 'Y-m-d',

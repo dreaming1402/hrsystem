@@ -39,7 +39,7 @@ class API_Controller extends MVC_Controller
 
 		$this->model->Load('API');
     }
-
+// Data
     public function getAction()	{ // done
     	$sql = [
     		'select'=> [],
@@ -49,7 +49,7 @@ class API_Controller extends MVC_Controller
 		$data = [
 			'response' => [
 				'success'	=> true,
-				'data'		=> $this->model->API->ExecuteQuery($sql, $this->uid),
+				'data'		=> $this->model->API->GetData($sql, GetLoginUserId()),
 			],
 		];
 
@@ -61,7 +61,7 @@ class API_Controller extends MVC_Controller
 			'insert' => [
 				'id' => 'temp'.rand(1,100),
 				$this->tableName.'_create_date' => date(DB_DATE_FORMAT), // auto create date
-				$this->tableName.'_create_by'	  => $this->uid,
+				$this->tableName.'_create_by'	  => GetLoginUserId(),
 				$this->tableName.'_trash_flag'  => false,
 			],
 			'into' => $this->tableName,
@@ -102,7 +102,7 @@ class API_Controller extends MVC_Controller
 			'update' => [
 				$_GET['key'] => $_GET['value'],
 				$this->tableName.'_mod_date' => date(DB_DATE_FORMAT),
-				$this->tableName.'_mod_by'   => $this->uid,
+				$this->tableName.'_mod_by'   => GetLoginUserId(),
 			],
 			'table' => $this->tableName,
 			'where' => [
@@ -148,7 +148,7 @@ class API_Controller extends MVC_Controller
 			'update' => [
 				$this->tableName.'_trash_flag' => true,
 				$this->tableName.'_trash_date' => date(DB_DATE_FORMAT),
-				$this->tableName.'_trash_by'   => $this->uid,
+				$this->tableName.'_trash_by'   => GetLoginUserId(),
 			],
 			'table' => $this->tableName,
 			'where' => [
@@ -192,7 +192,7 @@ class API_Controller extends MVC_Controller
 			'update' => [
 				$this->tableName.'_trash_flag' => false,
 				$this->tableName.'_restore_date' => date(DB_DATE_FORMAT),
-				$this->tableName.'_restore_by'   => $this->uid,
+				$this->tableName.'_restore_by'   => GetLoginUserId(),
 			],
 			'table' => $this->tableName,
 			'where' => [
@@ -241,7 +241,7 @@ class API_Controller extends MVC_Controller
 			],
 		];
 
-		$result = $this->model->API->DeleteRow($sql['delete'], $sql['where'][0], $this->uid);
+		$result = $this->model->API->DeleteRow($sql['delete'], $sql['where'][0], GetLoginUserId());
 
     	if ($result) {
     		$data = [
@@ -264,5 +264,31 @@ class API_Controller extends MVC_Controller
     	}
 
     	$this->view->Load('json', $data);
+	}
+
+// Table
+	public function newTableAction() {
+		// Define
+		$data = [
+			'response' => [
+				'success'	=> false,
+				'message'	=> 'Tạo bảng mới thất bại',
+				'data'	=> [],
+			],
+		];
+
+		$result = $this->model->API->NewTable($this->tableName, GetLoginUserId());
+
+		echo $result;
+
+		if ($result) {
+			$data['response']['success'] = true;
+			$data['response']['message'] = 'Tạo thành công "'.$this->tableName.'"';
+			$data['response']['data']    = $this->tableName;
+		} else {
+			$data['response']['message'] = 'Đã tồn tại "'.$this->tableName.'"';
+		}
+
+		$this->view->load('json', $data);
 	}
 }
