@@ -12,7 +12,7 @@ class PrintCard_Controller extends Base_Controller
             $_POST['maternity_end'] = FormatDateToSql($_POST['maternity_end']);
 
 			$_POST[$this->tableName.'_create_date'] = date(DB_DATE_FORMAT);
-			$_POST[$this->tableName.'_create_by'] = $this->uid;
+			$_POST[$this->tableName.'_create_by'] = GetLoginUserId();
 
 
     		$query = $this->model->API->InsertRow($this->tableName, $_POST);
@@ -39,7 +39,6 @@ class PrintCard_Controller extends Base_Controller
 
     	$data = [
     		'page_title'=> 'In thẻ nhân viên',
-    		'uid'		=> $this->uid,
 
 	        'fancyform'	=> [
 	        	'items'	=> [
@@ -546,7 +545,7 @@ class PrintCard_Controller extends Base_Controller
 			$sql_print_card['where'][0]['id'] = $_where['id'];
 		};
 
-		$print_card_data = $this->model->API->ExecuteQuery($sql_print_card, $this->uid);
+		$print_card_data = $this->model->API->GetData($sql_print_card, GetLoginUserId());
 		$print_data = [];
 		foreach ($print_card_data as $index => $row) {
 			$print_data[$row['employee_id']] = $row;
@@ -1036,7 +1035,7 @@ class PrintCard_Controller extends Base_Controller
 			$sql_print_card['where'][0]['id'] = $_where['id'];
 		};
 
-		$print_card_data = $this->model->API->ExecuteQuery($sql_print_card, $this->uid);
+		$print_card_data = $this->model->API->GetData($sql_print_card, GetLoginUserId());
 
 		$data = [
 			'response' => [
@@ -1071,7 +1070,7 @@ class PrintCard_Controller extends Base_Controller
         			'update'	=> [
         				$this->tableName.'_trash_flag'	=> true,
         				$this->tableName.'_trash_date'	=> date(DB_DATE_FORMAT),
-        				$this->tableName.'_trash_by'	=> $this->uid,
+        				$this->tableName.'_trash_by'	=> GetLoginUserId(),
         			],
         			'table'	=> $this->tableName,
         			'where'	=> [
@@ -1119,7 +1118,7 @@ class PrintCard_Controller extends Base_Controller
         			'update' => [
         				$this->tableName.'_trash_flag'	=> false,
         				$this->tableName.'_restore_date'=> date(DB_DATE_FORMAT),
-        				$this->tableName.'_restore_by'	=> $this->uid,
+        				$this->tableName.'_restore_by'	=> GetLoginUserId(),
         			],
         			'table'	=> $this->tableName,
         			'where'	=> [
@@ -1172,7 +1171,7 @@ class PrintCard_Controller extends Base_Controller
         			],
         		];
 
-        		$query_flag = $this->model->API->DeleteRow($sql['delete'], $sql['where'][0], $this->uid);
+        		$query_flag = $this->model->API->DeleteRow($sql['delete'], $sql['where'][0], GetLoginUserId());
 
 				if ($query_flag) {
 					$data['response']['success'] = true;
